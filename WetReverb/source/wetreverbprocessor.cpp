@@ -124,9 +124,16 @@ tresult PLUGIN_API WetReverbProcessorProcessor::process (Vst::ProcessData& data)
 					if (paramQueue->getPoint (numPoints - 1, sampleOffset, value) == kResultTrue)
 					{
 						// Convert normalized value (0.0-1.0) to index (0-4)
-						currentReverbMode = static_cast<int>(value * 4.0 + 0.5);
-						if (currentReverbMode < 0) currentReverbMode = 0;
-						if (currentReverbMode > 4) currentReverbMode = 4;
+						int newMode = static_cast<int>(value * 4.0 + 0.5);
+						if (newMode < 0) newMode = 0;
+						if (newMode > 4) newMode = 4;
+						
+						// Clear reverb buffers on mode change to avoid artifacts
+						if (newMode != currentReverbMode)
+						{
+							reverbBuffer.reset();
+							currentReverbMode = newMode;
+						}
 					}
 				}
 			}

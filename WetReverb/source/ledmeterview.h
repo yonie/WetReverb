@@ -12,7 +12,7 @@ namespace Yonie {
 
 //------------------------------------------------------------------------
 // LEDMeterView - Custom 80's style LED segment meter
-// Displays 12 discrete LED segments: 8 green, 2 yellow, 2 red
+// Displays 9 discrete LED segments: 6 green, 2 yellow, 1 red
 //------------------------------------------------------------------------
 class LEDMeterView : public VSTGUI::CControl
 {
@@ -39,20 +39,20 @@ protected:
     VSTGUI::CColor getLitColor(int segmentIndex) const;
     VSTGUI::CColor getDarkColor(int segmentIndex) const;
     
-    int numSegments = 12;
+    int numSegments = 9;
     VSTGUI::CCoord segmentGap = 2;
     bool isHorizontal = true;
     
     // Color definitions for 80's LED look
-    // Green zone (segments 0-7)
+    // Green zone (segments 0-5)
     VSTGUI::CColor greenLit{0, 255, 0, 255};
     VSTGUI::CColor greenDark{10, 42, 10, 255};
     
-    // Yellow zone (segments 8-9)
+    // Yellow zone (segments 6-7)
     VSTGUI::CColor yellowLit{255, 255, 0, 255};
     VSTGUI::CColor yellowDark{42, 42, 10, 255};
     
-    // Red zone (segments 10-11)
+    // Red zone (segment 8)
     VSTGUI::CColor redLit{255, 0, 0, 255};
     VSTGUI::CColor redDark{42, 10, 10, 255};
 };

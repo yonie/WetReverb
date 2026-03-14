@@ -10,7 +10,7 @@
 namespace Yonie {
 
 //------------------------------------------------------------------------
-// ButtonSelectionFrame - Draws 80's style LED indicators for delay buttons
+// ButtonSelectionFrame - Draws 80's style LED indicators for reverb buttons
 // Shows bright red LED for selected button, dark red for others
 //------------------------------------------------------------------------
 class ButtonSelectionFrame : public VSTGUI::CControl

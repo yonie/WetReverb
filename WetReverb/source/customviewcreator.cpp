@@ -91,7 +91,7 @@ bool LEDMeterViewCreator::getAttributeValue(CView* view, const std::string& attr
     // For now, just return default values
     if (attributeName == kAttrNumSegments)
     {
-        stringValue = "12";
+        stringValue = "9";
         return true;
     }
     if (attributeName == kAttrSegmentGap)

@@ -9,11 +9,11 @@ using namespace VSTGUI;
 namespace Yonie {
 
 // Hardcoded button X positions (relative to view left at x=39)
-// Absolute positions: 40, 149, 257, 366, 474, 582
-// Each button is 87px wide, 119px tall
-static const CCoord kButtonOffsets[6] = { 1, 110, 218, 327, 435, 543 };
-static const CCoord kButtonWidth = 87;
-static const int kNumButtons = 6;
+// 5 reverb modes: Room, Plate, Hall, Cathedral, Cosmos
+// Each button is 110x110 pixels
+static const CCoord kButtonOffsets[5] = { 0, 126, 252, 378, 504 };
+static const CCoord kButtonWidth = 110;
+static const int kNumButtons = 5;
 
 //------------------------------------------------------------------------
 // ButtonSelectionFrame Implementation
@@ -30,16 +30,16 @@ void ButtonSelectionFrame::draw(CDrawContext* context)
 {
     CRect viewSize = getViewSize();
     
-    // Calculate which button is selected (0 to 5)
+    // Calculate which button is selected (0 to 4)
     float val = getValueNormalized();
-    int selectedIndex = static_cast<int>(val * 5 + 0.5f);
+    int selectedIndex = static_cast<int>(val * 4.0f + 0.5f);
     if (selectedIndex < 0) selectedIndex = 0;
-    if (selectedIndex > 5) selectedIndex = 5;
+    if (selectedIndex > 4) selectedIndex = 4;
     
     // Draw LED indicator for each button
     for (int i = 0; i < kNumButtons; i++)
     {
-        // Calculate LED position - centered at top of each button
+        // Calculate LED position - centered within each button
         CCoord buttonX = viewSize.left + kButtonOffsets[i];
         CCoord buttonCenterX = buttonX + kButtonWidth / 2;
         

@@ -84,19 +84,16 @@ CRect LEDMeterView::calculateSegmentRect(int segmentIndex) const
 //------------------------------------------------------------------------
 CColor LEDMeterView::getLitColor(int segmentIndex) const
 {
-    // 12 segments: 0-7 green, 8-9 yellow, 10-11 red
-    // Scale for different segment counts
-    float position = static_cast<float>(segmentIndex) / (numSegments - 1);
-    
-    if (position < 0.67f)  // First ~67% (green zone)
+    // 9 segments: 0-5 green, 6-7 yellow, 8 red
+    if (segmentIndex < 6)  // Green zone (segments 0-5)
     {
         return greenLit;
     }
-    else if (position < 0.83f)  // Next ~16% (yellow zone)
+    else if (segmentIndex < 8)  // Yellow zone (segments 6-7)
     {
         return yellowLit;
     }
-    else  // Last ~17% (red zone)
+    else  // Red zone (segment 8)
     {
         return redLit;
     }
@@ -106,17 +103,15 @@ CColor LEDMeterView::getLitColor(int segmentIndex) const
 CColor LEDMeterView::getDarkColor(int segmentIndex) const
 {
     // Same zones as lit colors, but darker
-    float position = static_cast<float>(segmentIndex) / (numSegments - 1);
-    
-    if (position < 0.67f)
+    if (segmentIndex < 6)  // Green zone
     {
         return greenDark;
     }
-    else if (position < 0.83f)
+    else if (segmentIndex < 8)  // Yellow zone
     {
         return yellowDark;
     }
-    else
+    else  // Red zone
     {
         return redDark;
     }
