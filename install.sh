@@ -1,0 +1,78 @@
+#!/bin/bash
+echo "================================================"
+echo " WetReverb VST3 Plugin - Installation"
+echo "================================================"
+echo ""
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+# Detect platform and set paths
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    PLATFORM="macOS"
+    PLUGIN_DEST="$HOME/Library/Audio/Plug-Ins/VST3"
+    # macOS Xcode build outputs to Release/ directory
+    if [ -d "WetReverb/build/Release/WetReverb.vst3" ]; then
+        PLUGIN_SOURCE="WetReverb/build/Release/WetReverb.vst3"
+    else
+        PLUGIN_SOURCE="WetReverb/build/VST3/Release/WetReverb.vst3"
+    fi
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    # Linux
+    PLATFORM="Linux"
+    PLUGIN_DEST="$HOME/.vst3"
+    PLUGIN_SOURCE="WetReverb/build/VST3/Release/WetReverb.vst3"
+else
+    echo "ERROR: Unsupported platform: $OSTYPE"
+    echo "This script only supports Linux and macOS."
+    echo "For Windows, use install.bat"
+    exit 1
+fi
+
+if [ ! -d "$PLUGIN_SOURCE" ]; then
+    echo "ERROR: Plugin not found at $PLUGIN_SOURCE"
+    echo ""
+    echo "Please run ./build.sh first to build the plugin."
+    echo ""
+    exit 1
+fi
+
+if [ ! -d "$PLUGIN_DEST" ]; then
+    echo "Creating VST3 directory: $PLUGIN_DEST"
+    mkdir -p "$PLUGIN_DEST"
+fi
+
+echo "Installing WetReverb.vst3 to $PLUGIN_DEST..."
+cp -r "$PLUGIN_SOURCE" "$PLUGIN_DEST/"
+
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "================================================"
+    echo " Installation successful!"
+    echo "================================================"
+    echo ""
+    echo "Plugin installed to: $PLUGIN_DEST/WetReverb.vst3"
+    echo ""
+    
+    if [[ "$PLATFORM" == "macOS" ]]; then
+        echo "Note for macOS:"
+        echo "  - Builds include ad-hoc code signing to bypass Gatekeeper"
+        echo "  - You may see a one-time prompt - click 'Open' to proceed"
+        echo "  - If blocked: right-click plugin -> 'Open' -> 'Open'"
+        echo ""
+    fi
+    
+    echo "Next steps:"
+    echo "1. Restart your DAW if it's running"
+    echo "2. Scan for new plugins (most DAWs do this automatically)"
+    echo "3. Look for WetReverb in your plugin list"
+    echo ""
+else
+    echo ""
+    echo "ERROR: Installation failed"
+    echo ""
+    exit 1
+fi
+
+cd "$SCRIPT_DIR"
