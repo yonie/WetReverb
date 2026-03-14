@@ -1,0 +1,346 @@
+//------------------------------------------------------------------------
+// Copyright(c) 2026 Yonie.
+//------------------------------------------------------------------------
+
+#pragma once
+
+#include <vector>
+#include <cstring>
+#include <cmath>
+#include <random>
+
+namespace Yonie {
+
+//------------------------------------------------------------------------
+// OnePoleFilter - Simple 1st-order (6 dB/oct) filter
+//------------------------------------------------------------------------
+class OnePoleFilter
+{
+public:
+    enum class Type { LowPass, HighPass };
+    
+    OnePoleFilter() : z1(0.0f), type(Type::LowPass), coefficient(0.0f) {}
+    
+    void setCoefficients(double sampleRate, double cutoffHz, Type filterType)
+    {
+        type = filterType;
+        double omega = 2.0 * 3.14159265358979323846 * cutoffHz / sampleRate;
+        coefficient = static_cast<float>(1.0 - std::exp(-omega));
+    }
+    
+    void setCoefficient(float coef, Type filterType)
+    {
+        coefficient = coef;
+        type = filterType;
+    }
+    
+    float process(float input)
+    {
+        float output;
+        if (type == Type::LowPass)
+        {
+            output = coefficient * input + (1.0f - coefficient) * z1;
+        }
+        else
+        {
+            float lpf = coefficient * input + (1.0f - coefficient) * z1;
+            output = input - lpf;
+        }
+        z1 = output;
+        return output;
+    }
+    
+    void reset() { z1 = 0.0f; }
+    
+private:
+    float z1;
+    Type type;
+    float coefficient;
+};
+
+//------------------------------------------------------------------------
+// LinearResampler - Same as WetDelay, proven working
+//------------------------------------------------------------------------
+class LinearResampler
+{
+public:
+    LinearResampler() : phase(0.0), lastSample(0.0f) {}
+    
+    void reset()
+    {
+        phase = 0.0;
+        lastSample = 0.0f;
+    }
+    
+    // Downsample from higher rate to lower rate
+    int downsample(const float* input, int inputSamples,
+                   float* output, int maxOutputSamples,
+                   double inputRate, double outputRate)
+    {
+        double ratio = inputRate / outputRate;
+        int outCount = 0;
+        
+        for (int i = 0; i < inputSamples && outCount < maxOutputSamples; ++i)
+        {
+            float currentSample = input[i];
+            
+            while (phase < 1.0 && outCount < maxOutputSamples)
+            {
+                float t = static_cast<float>(phase);
+                output[outCount++] = lastSample + t * (currentSample - lastSample);
+                phase += ratio;
+            }
+            
+            phase -= 1.0;
+            lastSample = currentSample;
+        }
+        
+        return outCount;
+    }
+    
+    // Upsample from lower rate to higher rate
+    int upsample(const float* input, int inputSamples,
+                 float* output, int outputSamples,
+                 double inputRate, double outputRate)
+    {
+        double ratio = inputRate / outputRate;
+        int inIndex = 0;
+        
+        for (int i = 0; i < outputSamples; ++i)
+        {
+            float t = static_cast<float>(phase);
+            float currentSample = (inIndex < inputSamples) ? input[inIndex] : lastSample;
+            output[i] = lastSample + t * (currentSample - lastSample);
+            
+            phase += ratio;
+            while (phase >= 1.0 && inIndex < inputSamples)
+            {
+                lastSample = input[inIndex++];
+                phase -= 1.0;
+            }
+        }
+        
+        if (inIndex > 0 && inIndex <= inputSamples)
+            lastSample = input[inIndex - 1];
+        
+        return outputSamples;
+    }
+    
+private:
+    double phase;
+    float lastSample;
+};
+
+//------------------------------------------------------------------------
+// DelayLine - Simple circular buffer
+//------------------------------------------------------------------------
+class DelayLine
+{
+public:
+    DelayLine() : writePos(0), delayLength(1) {}
+    
+    void prepare(int maxDelaySamples)
+    {
+        buffer.resize(maxDelaySamples + 1, 0.0f);
+        writePos = 0;
+    }
+    
+    void setDelay(int delaySamples)
+    {
+        delayLength = std::max(1, std::min(delaySamples, static_cast<int>(buffer.size()) - 1));
+    }
+    
+    float read() const
+    {
+        int readPos = writePos - delayLength;
+        if (readPos < 0) readPos += static_cast<int>(buffer.size());
+        return buffer[readPos];
+    }
+    
+    void write(float sample)
+    {
+        buffer[writePos] = sample;
+        writePos++;
+        if (writePos >= static_cast<int>(buffer.size())) writePos = 0;
+    }
+    
+    void reset()
+    {
+        std::fill(buffer.begin(), buffer.end(), 0.0f);
+        writePos = 0;
+    }
+    
+private:
+    std::vector<float> buffer;
+    int writePos;
+    int delayLength;
+};
+
+//------------------------------------------------------------------------
+// CombFilter - Schroeder comb with LPF in feedback
+//------------------------------------------------------------------------
+class CombFilter
+{
+public:
+    CombFilter() : writePos(0), delayLength(1), dampingState(0.0f) {}
+    
+    void prepare(int maxDelaySamples)
+    {
+        buffer.resize(maxDelaySamples + 1, 0.0f);
+        writePos = 0;
+        dampingState = 0.0f;
+    }
+    
+    void setDelay(int delaySamples)
+    {
+        delayLength = std::max(1, std::min(delaySamples, static_cast<int>(buffer.size()) - 1));
+    }
+    
+    float process(float input, float feedback, float dampingCoef)
+    {
+        int readPos = writePos - delayLength;
+        if (readPos < 0) readPos += static_cast<int>(buffer.size());
+        float delayed = buffer[readPos];
+        
+        // LPF in feedback path
+        dampingState = dampingCoef * delayed + (1.0f - dampingCoef) * dampingState;
+        
+        // Write to buffer
+        buffer[writePos] = input + dampingState * feedback;
+        writePos++;
+        if (writePos >= static_cast<int>(buffer.size())) writePos = 0;
+        
+        return delayed;
+    }
+    
+    void reset()
+    {
+        std::fill(buffer.begin(), buffer.end(), 0.0f);
+        writePos = 0;
+        dampingState = 0.0f;
+    }
+    
+private:
+    std::vector<float> buffer;
+    int writePos;
+    int delayLength;
+    float dampingState;
+};
+
+//------------------------------------------------------------------------
+// AllpassFilter - For diffusion
+//------------------------------------------------------------------------
+class AllpassFilter
+{
+public:
+    AllpassFilter() : writePos(0), delayLength(1) {}
+    
+    void prepare(int maxDelaySamples)
+    {
+        buffer.resize(maxDelaySamples + 1, 0.0f);
+        writePos = 0;
+    }
+    
+    void setDelay(int delaySamples)
+    {
+        delayLength = std::max(1, std::min(delaySamples, static_cast<int>(buffer.size()) - 1));
+    }
+    
+    float process(float input, float feedback)
+    {
+        int readPos = writePos - delayLength;
+        if (readPos < 0) readPos += static_cast<int>(buffer.size());
+        float delayed = buffer[readPos];
+        float output = -input + delayed;
+        buffer[writePos] = input + delayed * feedback;
+        writePos++;
+        if (writePos >= static_cast<int>(buffer.size())) writePos = 0;
+        return output;
+    }
+    
+    void reset()
+    {
+        std::fill(buffer.begin(), buffer.end(), 0.0f);
+        writePos = 0;
+    }
+    
+private:
+    std::vector<float> buffer;
+    int writePos;
+    int delayLength;
+};
+
+//------------------------------------------------------------------------
+// ReverbBuffer - Stereo reverb using WetDelay's proven resampling
+//------------------------------------------------------------------------
+class ReverbBuffer
+{
+public:
+    ReverbBuffer();
+    ~ReverbBuffer();
+    
+    void prepare(double sampleRate, float maxDecaySeconds);
+    
+    void processStereo(float* leftIn, float* leftOut,
+                       float* rightIn, float* rightOut,
+                       int numSamples,
+                       float decaySeconds,
+                       float preDelayMs,
+                       float hfDampHz,
+                       int numCombs,
+                       float feedback,
+                       float allpassFeedback,
+                       float earlyLevel,
+                       float lateLevel,
+                       float baseDelayMs);
+    
+    void reset();
+    
+private:
+    static constexpr double INTERNAL_SAMPLE_RATE = 24000.0;
+    static constexpr int MAX_COMBS = 6;
+    static constexpr int MAX_ALLPASSES = 2;
+    static constexpr float CROSSTALK = 0.01f;
+    
+    CombFilter combsL[MAX_COMBS];
+    CombFilter combsR[MAX_COMBS];
+    AllpassFilter allpassL[MAX_ALLPASSES];
+    AllpassFilter allpassR[MAX_ALLPASSES];
+    DelayLine preDelayL;
+    DelayLine preDelayR;
+    
+    LinearResampler downsamplerL;
+    LinearResampler downsamplerR;
+    LinearResampler upsamplerL;
+    LinearResampler upsamplerR;
+    
+    OnePoleFilter antiAliasL;
+    OnePoleFilter antiAliasR;
+    OnePoleFilter reconstructL;
+    OnePoleFilter reconstructR;
+    OnePoleFilter lowPassL;
+    OnePoleFilter lowPassR;
+    OnePoleFilter highPassL;
+    OnePoleFilter highPassR;
+    
+    std::vector<float> tempDownL;
+    std::vector<float> tempDownR;
+    std::vector<float> tempInternalL;   // Reverb input (from downsample)
+    std::vector<float> tempInternalR;
+    std::vector<float> tempOutL;        // Reverb output (to upsample)
+    std::vector<float> tempOutR;
+    
+    std::mt19937 rng;
+    std::uniform_real_distribution<float> dist;
+    
+    double hostSampleRate;
+    int maxDelaySamples;
+    
+    void setupCombs(int numCombs, float baseDelayMs);
+    void setupAllpasses();
+    
+    int msToSamples(float ms) const { return static_cast<int>(ms * INTERNAL_SAMPLE_RATE / 1000.0); }
+};
+
+//------------------------------------------------------------------------
+} // namespace Yonie

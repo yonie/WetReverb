@@ -1,0 +1,27 @@
+# Build directories
+build/
+WetReverb/build/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Compiled files
+*.o
+*.obj
+*.a
+*.lib
+
+# VST3 build artifacts
+*.vst3/
+WetReverb/.cache/
+
+# Local config
+local.props
