@@ -34,45 +34,45 @@
 	          transparent="false">
 		
 		<!-- ============================================ -->
-		<!-- INPUT METERS (12-segment LED style)         -->
+		<!-- INPUT METERS (9-segment LED style)          -->
 		<!-- ============================================ -->
 		
 		<view class="LEDMeterView"
 		      control-tag="kInputMeterL"
-		      origin="52, 96"
-		      size="254, 18"
-		      num-segments="12"
+		      origin="62, 103"
+		      size="265, 16"
+		      num-segments="9"
 		      segment-gap="2"
 		      horizontal="true"
 		      transparent="false"/>
 		
 		<view class="LEDMeterView"
 		      control-tag="kInputMeterR"
-		      origin="52, 129"
-		      size="254, 18"
-		      num-segments="12"
+		      origin="62, 134"
+		      size="265, 16"
+		      num-segments="9"
 		      segment-gap="2"
 		      horizontal="true"
 		      transparent="false"/>
 		
 		<!-- ============================================ -->
-		<!-- OUTPUT METERS (12-segment LED style)        -->
+		<!-- OUTPUT METERS (9-segment LED style)          -->
 		<!-- ============================================ -->
 		
 		<view class="LEDMeterView"
 		      control-tag="kOutputMeterL"
-		      origin="397, 96"
-		      size="254, 18"
-		      num-segments="12"
+		      origin="376, 103"
+		      size="263, 16"
+		      num-segments="9"
 		      segment-gap="2"
 		      horizontal="true"
 		      transparent="false"/>
 		
 		<view class="LEDMeterView"
 		      control-tag="kOutputMeterR"
-		      origin="397, 129"
-		      size="254, 18"
-		      num-segments="12"
+		      origin="376, 134"
+		      size="263, 16"
+		      num-segments="9"
 		      segment-gap="2"
 		      horizontal="true"
 		      transparent="false"/>
