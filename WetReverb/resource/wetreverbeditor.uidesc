@@ -39,7 +39,7 @@
 		
 		<view class="LEDMeterView"
 		      control-tag="kInputMeterL"
-		      origin="62, 103"
+		      origin="60, 103"
 		      size="265, 16"
 		      num-segments="9"
 		      segment-gap="2"
@@ -48,7 +48,7 @@
 		
 		<view class="LEDMeterView"
 		      control-tag="kInputMeterR"
-		      origin="62, 134"
+		      origin="60, 134"
 		      size="265, 16"
 		      num-segments="9"
 		      segment-gap="2"
@@ -61,7 +61,7 @@
 		
 		<view class="LEDMeterView"
 		      control-tag="kOutputMeterL"
-		      origin="376, 103"
+		      origin="380, 103"
 		      size="263, 16"
 		      num-segments="9"
 		      segment-gap="2"
@@ -70,7 +70,7 @@
 		
 		<view class="LEDMeterView"
 		      control-tag="kOutputMeterR"
-		      origin="376, 134"
+		      origin="380, 134"
 		      size="263, 16"
 		      num-segments="9"
 		      segment-gap="2"
