@@ -267,17 +267,15 @@ bool ButtonSelectionFrameCreator::getAttributeValue(CView* view, const std::stri
 }
 
 //------------------------------------------------------------------------
-// Static instances to auto-register
-//------------------------------------------------------------------------
-static LEDMeterViewCreator gLEDMeterViewCreator;
-static ButtonLEDIndicatorCreator gButtonLEDIndicatorCreator;
-static ButtonSelectionFrameCreator gButtonSelectionFrameCreator;
-
+// Explicit registration to avoid static initialization order issues.
+// Using function-local statics guarantees construction on first call
+// (thread-safe in C++11+), regardless of translation unit init order.
 //------------------------------------------------------------------------
 void registerCustomViews()
 {
-    // Views are auto-registered via static initialization
-    // This function can be called to ensure the translation unit is linked
+    static LEDMeterViewCreator sLEDMeterViewCreator;
+    static ButtonLEDIndicatorCreator sButtonLEDIndicatorCreator;
+    static ButtonSelectionFrameCreator sButtonSelectionFrameCreator;
 }
 
 //------------------------------------------------------------------------
