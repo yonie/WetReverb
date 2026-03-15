@@ -64,7 +64,7 @@ void ButtonSelectionFrame::draw(CDrawContext* context)
             {
                 glowPath->addEllipse(glowRect);
                 CColor glowColor = ledOnColor;
-                glowColor.alpha = 80;
+                glowColor.alpha = 45;
                 context->setFillColor(glowColor);
                 context->drawGraphicsPath(glowPath, CDrawContext::kPathFilled);
             }
@@ -78,6 +78,8 @@ void ButtonSelectionFrame::draw(CDrawContext* context)
         {
             ledPath->addEllipse(ledRect);
             CColor color = isSelected ? ledOnColor : ledOffColor;
+            if (isSelected)
+                color.alpha = 200;
             context->setFillColor(color);
             context->drawGraphicsPath(ledPath, CDrawContext::kPathFilled);
         }
