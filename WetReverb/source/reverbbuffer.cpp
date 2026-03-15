@@ -15,6 +15,70 @@ static const int PRIMES[] = {
 static const int NUM_PRIMES = sizeof(PRIMES) / sizeof(PRIMES[0]);
 
 //------------------------------------------------------------------------
+// Early reflection tap patterns per program
+// Each tap: { delayMs, gainL, gainR }
+// L/R gains differ slightly for stereo imaging.
+// Gains decay with distance to simulate absorption.
+//------------------------------------------------------------------------
+const EarlyReflectionPattern EARLY_REFLECTION_PATTERNS[5] = {
+    // Room: tight, closely spaced - small room walls close by
+    { 6, {
+        {  3.1f, 0.42f, 0.36f },
+        {  7.3f, 0.35f, 0.40f },
+        { 11.7f, 0.30f, 0.27f },
+        { 16.1f, 0.22f, 0.25f },
+        { 19.8f, 0.16f, 0.14f },
+        { 24.3f, 0.10f, 0.12f },
+        {  0.0f, 0.00f, 0.00f },
+        {  0.0f, 0.00f, 0.00f },
+    }},
+    // Plate: very dense, nearly uniform - metal plate has close reflections
+    { 5, {
+        {  1.7f, 0.38f, 0.35f },
+        {  4.3f, 0.36f, 0.38f },
+        {  7.9f, 0.33f, 0.31f },
+        { 11.3f, 0.30f, 0.33f },
+        { 16.7f, 0.26f, 0.24f },
+        {  0.0f, 0.00f, 0.00f },
+        {  0.0f, 0.00f, 0.00f },
+        {  0.0f, 0.00f, 0.00f },
+    }},
+    // Hall: wider spacing, gradual decay - large concert hall
+    { 7, {
+        {  8.3f, 0.38f, 0.32f },
+        { 15.7f, 0.32f, 0.36f },
+        { 22.1f, 0.27f, 0.24f },
+        { 29.9f, 0.22f, 0.26f },
+        { 37.3f, 0.18f, 0.16f },
+        { 44.7f, 0.13f, 0.15f },
+        { 53.1f, 0.09f, 0.08f },
+        {  0.0f, 0.00f, 0.00f },
+    }},
+    // Cathedral: wide spacing, slow decay - stone walls far apart
+    { 8, {
+        { 12.1f, 0.34f, 0.28f },
+        { 21.7f, 0.30f, 0.33f },
+        { 31.3f, 0.25f, 0.22f },
+        { 41.9f, 0.21f, 0.24f },
+        { 52.7f, 0.17f, 0.15f },
+        { 61.3f, 0.13f, 0.15f },
+        { 71.9f, 0.09f, 0.08f },
+        { 79.3f, 0.06f, 0.07f },
+    }},
+    // Cosmos: sparse, ethereal, wide gaps
+    { 6, {
+        { 15.3f, 0.30f, 0.24f },
+        { 31.7f, 0.26f, 0.29f },
+        { 49.1f, 0.21f, 0.18f },
+        { 63.9f, 0.16f, 0.19f },
+        { 78.3f, 0.11f, 0.09f },
+        { 91.7f, 0.07f, 0.08f },
+        {  0.0f, 0.00f, 0.00f },
+        {  0.0f, 0.00f, 0.00f },
+    }},
+};
+
+//------------------------------------------------------------------------
 ReverbBuffer::ReverbBuffer()
 : hostSampleRate(44100.0)
 , maxDelaySamples(0)
@@ -53,6 +117,9 @@ void ReverbBuffer::prepare(double sampleRate, float maxDecaySeconds)
     
     preDelayL.prepare(static_cast<int>(INTERNAL_SAMPLE_RATE * 0.1));
     preDelayR.prepare(static_cast<int>(INTERNAL_SAMPLE_RATE * 0.1));
+    
+    // Early reflections: max 100ms at internal rate
+    earlyReflections.prepare(static_cast<int>(INTERNAL_SAMPLE_RATE * 0.1));
     
     // Size buffers for max block size
     // tempDownL/R at host rate (8192 samples max)
@@ -116,6 +183,14 @@ void ReverbBuffer::setupAllpasses()
 }
 
 //------------------------------------------------------------------------
+void ReverbBuffer::setupEarlyReflections(int pattern)
+{
+    int idx = std::max(0, std::min(pattern, 4));
+    const EarlyReflectionPattern& pat = EARLY_REFLECTION_PATTERNS[idx];
+    earlyReflections.setTaps(pat.taps, pat.numTaps, INTERNAL_SAMPLE_RATE);
+}
+
+//------------------------------------------------------------------------
 void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
                                float* rightIn, float* rightOut,
                                int numSamples,
@@ -125,6 +200,7 @@ void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
                                int numCombs,
                                float feedback,
                                float allpassFeedback,
+                               int earlyPattern,
                                float earlyLevel,
                                float lateLevel,
                                float baseDelayMs)
@@ -133,6 +209,7 @@ void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
     
     setupCombs(numCombs, baseDelayMs);
     setupAllpasses();
+    setupEarlyReflections(earlyPattern);
     
     int preDelaySamp = std::max(1, std::min(msToSamples(preDelayMs), static_cast<int>(INTERNAL_SAMPLE_RATE * 0.05)));
     preDelayL.setDelay(preDelaySamp);
@@ -140,9 +217,6 @@ void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
     
     float dampCoef = static_cast<float>(1.0 - std::exp(-2.0 * 3.14159265358979323846 * std::min(hfDampHz, 10000.0f) / INTERNAL_SAMPLE_RATE));
     dampCoef = std::max(0.02f, std::min(0.98f, dampCoef));
-    
-    // Note: dampCoef is used by comb filters in their process() call
-    // The output lowPass keeps its fixed cutoff from prepare()
     
     // Step 1: Anti-alias filter at host rate
     for (int i = 0; i < numSamples; ++i)
@@ -154,11 +228,11 @@ void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
     // Step 2: Downsample to 24kHz (into tempInternal buffers)
     int maxInternal = static_cast<int>(tempInternalL.size());
     int internalSamples = downsamplerL.downsample(tempDownL.data(), numSamples,
-                                                   tempInternalL.data(), maxInternal,
-                                                   hostSampleRate, INTERNAL_SAMPLE_RATE);
+                                                    tempInternalL.data(), maxInternal,
+                                                    hostSampleRate, INTERNAL_SAMPLE_RATE);
     int actualR = downsamplerR.downsample(tempDownR.data(), numSamples,
-                                           tempInternalR.data(), maxInternal,
-                                           hostSampleRate, INTERNAL_SAMPLE_RATE);
+                                            tempInternalR.data(), maxInternal,
+                                            hostSampleRate, INTERNAL_SAMPLE_RATE);
     int actualInternal = std::min(internalSamples, actualR);
     if (actualInternal <= 0) actualInternal = 1;
     
@@ -171,10 +245,15 @@ void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
         float inL = preDelayL.read();
         float inR = preDelayR.read();
         
-        // Mono sum for combs
+        // Mono sum for comb filters and early reflections
         float monoIn = (inL + inR) * 0.5f;
         
-        // Parallel comb filters
+        // Early reflections: tapped delay line with stereo output
+        earlyReflections.write(monoIn);
+        float erL = 0.0f, erR = 0.0f;
+        earlyReflections.processToStereo(erL, erR);
+        
+        // Parallel comb filters (late reverb)
         float combOutL = 0.0f;
         float combOutR = 0.0f;
         for (int c = 0; c < numCombs && c < MAX_COMBS; ++c)
@@ -186,23 +265,21 @@ void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
         combOutR /= static_cast<float>(numCombs) * 1.5f;
         
         // Allpass diffusion
-        float outL = combOutL;
-        float outR = combOutR;
+        float lateL = combOutL;
+        float lateR = combOutR;
         for (int a = 0; a < MAX_ALLPASSES; ++a)
         {
-            outL = allpassL[a].process(outL, allpassFeedback);
-            outR = allpassR[a].process(outR, allpassFeedback);
+            lateL = allpassL[a].process(lateL, allpassFeedback);
+            lateR = allpassR[a].process(lateR, allpassFeedback);
         }
         
         // Late LPF
-        outL = lowPassL.process(outL);
-        outR = lowPassR.process(outR);
+        lateL = lowPassL.process(lateL);
+        lateR = lowPassR.process(lateR);
         
-        // Mix early and late
-        float earlyL = inL + CROSSTALK * inR;
-        float earlyR = inR + CROSSTALK * inL;
-        float finalL = earlyLevel * earlyL + lateLevel * outL;
-        float finalR = earlyLevel * earlyR + lateLevel * outR;
+        // Mix early reflections and late reverb
+        float finalL = earlyLevel * erL + lateLevel * lateL;
+        float finalR = earlyLevel * erR + lateLevel * lateR;
         
         // Highpass
         finalL = highPassL.process(finalL);
@@ -256,6 +333,7 @@ void ReverbBuffer::reset()
     }
     preDelayL.reset();
     preDelayR.reset();
+    earlyReflections.reset();
     
     antiAliasL.reset();
     antiAliasR.reset();
