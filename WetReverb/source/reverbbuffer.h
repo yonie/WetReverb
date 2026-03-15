@@ -271,6 +271,97 @@ private:
 };
 
 //------------------------------------------------------------------------
+// EarlyReflectionTap - Single tap definition for early reflections
+//------------------------------------------------------------------------
+struct EarlyReflectionTap
+{
+    float delayMs;      // Delay time in milliseconds
+    float gainL;        // Left channel gain
+    float gainR;        // Right channel gain
+};
+
+//------------------------------------------------------------------------
+// EarlyReflectionBuffer - Multitapped delay line for early reflections
+//   (separate from DelayLine since we need multi-tap reads)
+//------------------------------------------------------------------------
+class EarlyReflectionBuffer
+{
+public:
+    static constexpr int MAX_TAPS = 8;
+    
+    EarlyReflectionBuffer() : writePos(0), bufferSize(0), numTaps(0) {}
+    
+    void prepare(int maxDelaySamples)
+    {
+        bufferSize = maxDelaySamples + 1;
+        buffer.resize(bufferSize, 0.0f);
+        writePos = 0;
+    }
+    
+    void setTaps(const EarlyReflectionTap* taps, int count, double sampleRate)
+    {
+        numTaps = std::min(count, MAX_TAPS);
+        for (int i = 0; i < numTaps; ++i)
+        {
+            tapDelaySamples[i] = std::max(1, static_cast<int>(taps[i].delayMs * sampleRate / 1000.0));
+            tapDelaySamples[i] = std::min(tapDelaySamples[i], bufferSize - 1);
+            tapGainL[i] = taps[i].gainL;
+            tapGainR[i] = taps[i].gainR;
+        }
+    }
+    
+    void write(float sample)
+    {
+        buffer[writePos] = sample;
+        writePos++;
+        if (writePos >= bufferSize) writePos = 0;
+    }
+    
+    void processToStereo(float& outL, float& outR) const
+    {
+        outL = 0.0f;
+        outR = 0.0f;
+        for (int i = 0; i < numTaps; ++i)
+        {
+            int readPos = writePos - tapDelaySamples[i];
+            if (readPos < 0) readPos += bufferSize;
+            float sample = buffer[readPos];
+            outL += sample * tapGainL[i];
+            outR += sample * tapGainR[i];
+        }
+    }
+    
+    void reset()
+    {
+        std::fill(buffer.begin(), buffer.end(), 0.0f);
+        writePos = 0;
+    }
+    
+private:
+    std::vector<float> buffer;
+    int writePos;
+    int bufferSize;
+    int numTaps;
+    int tapDelaySamples[MAX_TAPS];
+    float tapGainL[MAX_TAPS];
+    float tapGainR[MAX_TAPS];
+};
+
+//------------------------------------------------------------------------
+// Early reflection patterns for each reverb program
+//------------------------------------------------------------------------
+enum class ReverbProgram { Room = 0, Plate, Hall, Cathedral, Cosmos, Count };
+
+struct EarlyReflectionPattern
+{
+    int numTaps;
+    EarlyReflectionTap taps[EarlyReflectionBuffer::MAX_TAPS];
+};
+
+// Defined in reverbbuffer.cpp
+extern const EarlyReflectionPattern EARLY_REFLECTION_PATTERNS[5];
+
+//------------------------------------------------------------------------
 // ReverbBuffer - Stereo reverb using WetDelay's proven resampling
 //------------------------------------------------------------------------
 class ReverbBuffer
@@ -290,6 +381,7 @@ public:
                        int numCombs,
                        float feedback,
                        float allpassFeedback,
+                       int earlyPattern,
                        float earlyLevel,
                        float lateLevel,
                        float baseDelayMs);
@@ -308,6 +400,7 @@ private:
     AllpassFilter allpassR[MAX_ALLPASSES];
     DelayLine preDelayL;
     DelayLine preDelayR;
+    EarlyReflectionBuffer earlyReflections;
     
     LinearResampler downsamplerL;
     LinearResampler downsamplerR;
@@ -338,6 +431,7 @@ private:
     
     void setupCombs(int numCombs, float baseDelayMs);
     void setupAllpasses();
+    void setupEarlyReflections(int pattern);
     
     int msToSamples(float ms) const { return static_cast<int>(ms * INTERNAL_SAMPLE_RATE / 1000.0); }
 };
