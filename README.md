@@ -50,13 +50,13 @@ The download includes **all platforms** in one universal bundle:
 
 ### Reverb Modes
 
-| Mode | RT60 | Comb Filters | Pre-delay | Character |
-|------|------|--------------|-----------|-----------|
-| Room | 0.6s | 4 | 0ms | Tight, grainy, dark |
-| Plate | 1.6s | 4 | 0ms | Dense, metallic |
-| Hall | 2.2s | 5 | 20ms | Smooth, warm |
-| Cathedral | 3.0s | 5 | 30ms | Lush, long |
-| Cosmos | 4.5s | 5 | 40ms | Ethereal, infinite |
+| Mode | RT60 | Comb Filters | Pre-delay | Early Refl. | Character |
+|------|------|--------------|-----------|--------------|-----------|
+| Room | 0.6s | 4 | 0ms | 3-24ms (6 taps) | Tight, grainy, dark |
+| Plate | 1.6s | 4 | 0ms | 2-17ms (5 taps) | Dense, metallic |
+| Hall | 2.2s | 5 | 20ms | 8-53ms (7 taps) | Smooth, warm |
+| Cathedral | 3.0s | 5 | 30ms | 12-79ms (8 taps) | Lush, long |
+| Cosmos | 4.5s | 5 | 40ms | 15-92ms (6 taps) | Ethereal, infinite |
 
 ## Features
 
@@ -72,6 +72,7 @@ Pure reverb signal output - no dry signal in the mix. Perfect for:
 - **TPDF Dither** - Smooth quantization
 - **-80 dBFS Noise Floor** - Realistic analog electronics simulation
 - **Stereo Crosstalk** - Authentic L/R channel bleed simulating analog circuitry
+- **Early Reflections** - Program-dependent multitapped delay lines for realistic room ambience
 - **HF Damping** - Mode-dependent high-frequency rolloff
 
 ### Schroeder-Style Algorithm
@@ -161,14 +162,16 @@ The build process automatically runs the official VST3 validator (47 tests).
 1. Anti-alias filter (10kHz LPF at host rate)
 2. Downsample to 24kHz (linear interpolation)
 3. Pre-delay (mode-dependent: 0-40ms)
-4. Parallel comb filters with internal damping (4-5 combs)
-5. Series allpass filters for diffusion (2 allpasses)
-6. Output low-pass filter (6kHz)
-7. High-pass filter (80Hz)
-8. 12-bit quantization with TPDF dither
-9. Noise floor injection (-80dBFS)
-10. Upsample to host rate
-11. Reconstruction filter (10kHz LPF)
+4. Early reflections (multitapped delay line, program-dependent)
+5. Parallel comb filters with internal damping (4-5 combs)
+6. Series allpass filters for diffusion (2 allpasses)
+7. Mix early reflections + late reverb
+8. Output low-pass filter (6kHz)
+9. High-pass filter (80Hz)
+10. 12-bit quantization with TPDF dither
+11. Noise floor injection (-80dBFS)
+12. Upsample to host rate
+13. Reconstruction filter (10kHz LPF)
 
 ## Project Structure
 
