@@ -3,15 +3,17 @@
 //------------------------------------------------------------------------
 
 #include "buttonselectionframe.h"
+#include "vstgui/lib/cgraphicspath.h"
 
 using namespace VSTGUI;
 
 namespace Yonie {
 
-// Hardcoded button X positions (relative to view left at x=39)
+// Hardcoded button X positions (relative to view left at x=54)
 // 5 reverb modes: Room, Plate, Hall, Cathedral, Cosmos
+// Absolute X positions: 54, 173, 294, 415, 537
 // Each button is 110x110 pixels
-static const CCoord kButtonOffsets[5] = { 0, 126, 252, 378, 504 };
+static const CCoord kButtonOffsets[5] = { 0, 119, 240, 361, 483 };
 static const CCoord kButtonWidth = 110;
 static const int kNumButtons = 5;
 
@@ -36,37 +38,49 @@ void ButtonSelectionFrame::draw(CDrawContext* context)
     if (selectedIndex < 0) selectedIndex = 0;
     if (selectedIndex > 4) selectedIndex = 4;
     
+    // LED radius settings
+    CCoord ledRadius = 8;      // Main LED radius
+    CCoord glowRadius = 14;    // Glow radius for selected button
+    
+    context->setDrawMode(kAntiAliasing);
+    
     // Draw LED indicator for each button
     for (int i = 0; i < kNumButtons; i++)
     {
-        // Calculate LED position - centered within each button
+        // Calculate button position and center
         CCoord buttonX = viewSize.left + kButtonOffsets[i];
         CCoord buttonCenterX = buttonX + kButtonWidth / 2;
+        CCoord buttonCenterY = viewSize.top + 35;  // Upper half of 110px tall button
         
-        // LED positioned at top of button area with small margin
-        CCoord ledX = buttonCenterX - ledWidth / 2;
-        CCoord ledY = viewSize.top + 12;  // 12px from top
-        
-        CRect ledRect(ledX, ledY, ledX + ledWidth, ledY + ledHeight);
-        
-        // Choose color based on selection state
         bool isSelected = (i == selectedIndex);
         
+        // Draw glow effect for selected button
         if (isSelected)
         {
-            // Draw glow effect behind the LED for "on" state
-            CRect glowRect = ledRect;
-            glowRect.extend(2, 1);
-            CColor glowColor = ledOnColor;
-            glowColor.alpha = 60;
-            context->setFillColor(glowColor);
-            context->drawRect(glowRect, kDrawFilled);
+            CRect glowRect(buttonCenterX - glowRadius, buttonCenterY - glowRadius,
+                          buttonCenterX + glowRadius, buttonCenterY + glowRadius);
+            auto glowPath = owned(context->createGraphicsPath());
+            if (glowPath)
+            {
+                glowPath->addEllipse(glowRect);
+                CColor glowColor = ledOnColor;
+                glowColor.alpha = 80;
+                context->setFillColor(glowColor);
+                context->drawGraphicsPath(glowPath, CDrawContext::kPathFilled);
+            }
         }
         
-        // Draw the LED bar
-        CColor color = isSelected ? ledOnColor : ledOffColor;
-        context->setFillColor(color);
-        context->drawRect(ledRect, kDrawFilled);
+        // Draw main LED circle using CGraphicsPath
+        CRect ledRect(buttonCenterX - ledRadius, buttonCenterY - ledRadius,
+                     buttonCenterX + ledRadius, buttonCenterY + ledRadius);
+        auto ledPath = owned(context->createGraphicsPath());
+        if (ledPath)
+        {
+            ledPath->addEllipse(ledRect);
+            CColor color = isSelected ? ledOnColor : ledOffColor;
+            context->setFillColor(color);
+            context->drawGraphicsPath(ledPath, CDrawContext::kPathFilled);
+        }
     }
     
     setDirty(false);

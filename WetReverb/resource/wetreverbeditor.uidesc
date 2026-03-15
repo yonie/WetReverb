@@ -84,7 +84,7 @@
 		
 		<view class="CSegmentButton"
 		      control-tag="kReverbModeParam"
-		      origin="39, 459"
+		      origin="54, 418"
 		      size="630, 119"
 		      font="TinyFont"
 		      font-color="Transparent"
@@ -108,7 +108,7 @@
 		
 		<view class="ButtonSelectionFrame"
 		      control-tag="kReverbModeParam"
-		      origin="39, 459"
+		      origin="54, 418"
 		      size="630, 119"
 		      transparent="true"/>
 		
