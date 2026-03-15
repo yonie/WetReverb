@@ -26,6 +26,12 @@ tresult PLUGIN_API WetReverbProcessorController::initialize (FUnknown* context)
 		return result;
 	}
 
+	// Ensure custom view creators are registered before any UI is created.
+	// This avoids relying on static initialization order (SIOF) which can
+	// cause ButtonSelectionFrame and LEDMeterView to not be registered with
+	// the UIViewFactory, resulting in missing circles and backplate on open.
+	registerCustomViews();
+
 	// Register reverb mode parameter (0-4 for 5 positions)
 	Vst::StringListParameter* reverbParam = new Vst::StringListParameter(
 		STR16("Reverb Mode"),
