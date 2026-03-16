@@ -1,3 +1,6 @@
+# External dependencies (cloned in CI)
+vst3sdk/
+
 # Build directories
 build/
 WetReverb/build/
