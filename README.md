@@ -7,6 +7,8 @@
 
 A professional reverb VST3 plugin with authentic 80s digital character, inspired by the Yamaha R1000, Electro-Harmonix Holy Grail, and Roland DEP-5.
 
+![WetReverb Plugin Screenshot](screenshot.png)
+
 ## Quick Start
 
 ### Download
