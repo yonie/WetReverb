@@ -294,7 +294,7 @@ void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
         finalR = std::floor((finalR + ditherR) * LEVELS) / LEVELS;
         
         // Noise floor
-        constexpr float NOISE = 0.0001f;
+        constexpr float NOISE = 0.00005f;
         finalL += dist(rng) * NOISE;
         finalR += dist(rng) * NOISE;
         
