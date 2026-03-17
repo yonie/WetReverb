@@ -70,7 +70,7 @@ Pure reverb signal output - no dry signal in the mix. Perfect for:
 - **24 kHz Internal Sample Rate** - Authentic vintage digital reverb with band-limited frequency response
 - **12-bit Quantization** - Classic gritty digital character
 - **TPDF Dither** - Smooth quantization
-- **-80 dBFS Noise Floor** - Realistic analog electronics simulation
+- **-86 dBFS Noise Floor** - Realistic analog electronics simulation
 - **Stereo Crosstalk** - Authentic L/R channel bleed simulating analog circuitry
 - **Early Reflections** - Program-dependent multitapped delay lines for realistic room ambience
 - **HF Damping** - Mode-dependent high-frequency rolloff
@@ -169,7 +169,7 @@ The build process automatically runs the official VST3 validator (47 tests).
 8. Output low-pass filter (6kHz)
 9. High-pass filter (80Hz)
 10. 12-bit quantization with TPDF dither
-11. Noise floor injection (-80dBFS)
+11. Noise floor injection (-86dBFS)
 12. Upsample to host rate
 13. Reconstruction filter (10kHz LPF)
 
