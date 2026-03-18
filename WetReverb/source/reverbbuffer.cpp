@@ -21,58 +21,58 @@ static const int NUM_PRIMES = sizeof(PRIMES) / sizeof(PRIMES[0]);
 // Gains decay with distance to simulate absorption.
 //------------------------------------------------------------------------
 const EarlyReflectionPattern EARLY_REFLECTION_PATTERNS[5] = {
-    // Room: tight, closely spaced - small room walls close by
+    // Room: small space, tight reflections 3-25ms
     { 6, {
-        {  3.1f, 0.42f, 0.36f },
-        {  7.3f, 0.35f, 0.40f },
-        { 11.7f, 0.30f, 0.27f },
-        { 16.1f, 0.22f, 0.25f },
-        { 19.8f, 0.16f, 0.14f },
-        { 24.3f, 0.10f, 0.12f },
+        {  3.1f, 0.40f, 0.34f },
+        {  7.3f, 0.33f, 0.38f },
+        { 11.7f, 0.28f, 0.25f },
+        { 16.1f, 0.21f, 0.24f },
+        { 19.8f, 0.15f, 0.13f },
+        { 24.3f, 0.09f, 0.11f },
         {  0.0f, 0.00f, 0.00f },
         {  0.0f, 0.00f, 0.00f },
     }},
-    // Plate: very dense, nearly uniform - metal plate has close reflections
+    // Plate: dense, 5 taps at 2-17ms
     { 5, {
-        {  1.7f, 0.38f, 0.35f },
-        {  4.3f, 0.36f, 0.38f },
-        {  7.9f, 0.33f, 0.31f },
-        { 11.3f, 0.30f, 0.33f },
-        { 16.7f, 0.26f, 0.24f },
+        {  1.7f, 0.36f, 0.33f },
+        {  4.3f, 0.34f, 0.36f },
+        {  7.9f, 0.31f, 0.29f },
+        { 11.3f, 0.28f, 0.31f },
+        { 16.7f, 0.24f, 0.22f },
         {  0.0f, 0.00f, 0.00f },
         {  0.0f, 0.00f, 0.00f },
         {  0.0f, 0.00f, 0.00f },
     }},
-    // Hall: wider spacing, gradual decay - large concert hall
+    // Hall: wider spacing, 7 taps at 8-53ms
     { 7, {
-        {  8.3f, 0.38f, 0.32f },
-        { 15.7f, 0.32f, 0.36f },
-        { 22.1f, 0.27f, 0.24f },
-        { 29.9f, 0.22f, 0.26f },
-        { 37.3f, 0.18f, 0.16f },
-        { 44.7f, 0.13f, 0.15f },
-        { 53.1f, 0.09f, 0.08f },
+        {  8.3f, 0.36f, 0.30f },
+        { 15.7f, 0.30f, 0.34f },
+        { 22.1f, 0.25f, 0.22f },
+        { 29.9f, 0.20f, 0.24f },
+        { 37.3f, 0.16f, 0.14f },
+        { 44.7f, 0.11f, 0.13f },
+        { 53.1f, 0.07f, 0.06f },
         {  0.0f, 0.00f, 0.00f },
     }},
-    // Cathedral: wide spacing, slow decay - stone walls far apart
+    // Cathedral: wide spacing, 8 taps at 12-79ms
     { 8, {
-        { 12.1f, 0.34f, 0.28f },
-        { 21.7f, 0.30f, 0.33f },
-        { 31.3f, 0.25f, 0.22f },
-        { 41.9f, 0.21f, 0.24f },
-        { 52.7f, 0.17f, 0.15f },
-        { 61.3f, 0.13f, 0.15f },
-        { 71.9f, 0.09f, 0.08f },
-        { 79.3f, 0.06f, 0.07f },
+        { 12.1f, 0.32f, 0.26f },
+        { 21.7f, 0.28f, 0.31f },
+        { 31.3f, 0.23f, 0.20f },
+        { 41.9f, 0.19f, 0.22f },
+        { 52.7f, 0.15f, 0.13f },
+        { 61.3f, 0.11f, 0.13f },
+        { 71.9f, 0.07f, 0.06f },
+        { 79.3f, 0.04f, 0.05f },
     }},
-    // Cosmos: sparse, ethereal, wide gaps
+    // Cosmos: sparse, ethereal, 6 taps at 15-92ms
     { 6, {
-        { 15.3f, 0.30f, 0.24f },
-        { 31.7f, 0.26f, 0.29f },
-        { 49.1f, 0.21f, 0.18f },
-        { 63.9f, 0.16f, 0.19f },
-        { 78.3f, 0.11f, 0.09f },
-        { 91.7f, 0.07f, 0.08f },
+        { 15.3f, 0.28f, 0.22f },
+        { 31.7f, 0.24f, 0.27f },
+        { 49.1f, 0.19f, 0.16f },
+        { 63.9f, 0.14f, 0.17f },
+        { 78.3f, 0.09f, 0.07f },
+        { 91.7f, 0.05f, 0.06f },
         {  0.0f, 0.00f, 0.00f },
         {  0.0f, 0.00f, 0.00f },
     }},
@@ -118,8 +118,8 @@ void ReverbBuffer::prepare(double sampleRate, float maxDecaySeconds)
     preDelayL.prepare(static_cast<int>(INTERNAL_SAMPLE_RATE * 0.1));
     preDelayR.prepare(static_cast<int>(INTERNAL_SAMPLE_RATE * 0.1));
     
-    // Early reflections: max 100ms at internal rate
-    earlyReflections.prepare(static_cast<int>(INTERNAL_SAMPLE_RATE * 0.1));
+    // Early reflections: max 500ms at internal rate (enough for prime delays up to 200ms)
+    earlyReflections.prepare(static_cast<int>(INTERNAL_SAMPLE_RATE * 0.5));
     
     // Size buffers for max block size
     // tempDownL/R at host rate (8192 samples max)
@@ -218,7 +218,6 @@ void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
     float dampCoef = static_cast<float>(1.0 - std::exp(-2.0 * 3.14159265358979323846 * std::min(hfDampHz, 10000.0f) / INTERNAL_SAMPLE_RATE));
     dampCoef = std::max(0.02f, std::min(0.98f, dampCoef));
     
-    // Step 1: Anti-alias filter at host rate
     for (int i = 0; i < numSamples; ++i)
     {
         tempDownL[i] = antiAliasL.process(leftIn[i]);
@@ -256,34 +255,43 @@ void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
         // Parallel comb filters (late reverb)
         float combOutL = 0.0f;
         float combOutR = 0.0f;
+        
         for (int c = 0; c < numCombs && c < MAX_COMBS; ++c)
         {
             combOutL += combsL[c].process(monoIn, feedback, dampCoef);
             combOutR += combsR[c].process(monoIn, feedback, dampCoef);
         }
-        combOutL /= static_cast<float>(numCombs) * 1.5f;
-        combOutR /= static_cast<float>(numCombs) * 1.5f;
+        if (numCombs > 0)
+        {
+            combOutL /= static_cast<float>(numCombs) * 1.5f;
+            combOutR /= static_cast<float>(numCombs) * 1.5f;
+        }
         
-        // Allpass diffusion
         float lateL = combOutL;
         float lateR = combOutR;
-        for (int a = 0; a < MAX_ALLPASSES; ++a)
-        {
-            lateL = allpassL[a].process(lateL, allpassFeedback);
-            lateR = allpassR[a].process(lateR, allpassFeedback);
+        
+        if (numCombs > 0) {
+            for (int a = 0; a < MAX_ALLPASSES; ++a)
+            {
+                lateL = allpassL[a].process(lateL, allpassFeedback);
+                lateR = allpassR[a].process(lateR, allpassFeedback);
+            }
         }
         
         // Late LPF
         lateL = lowPassL.process(lateL);
         lateR = lowPassR.process(lateR);
         
-        // Mix early reflections and late reverb
         float finalL = earlyLevel * erL + lateLevel * lateL;
         float finalR = earlyLevel * erR + lateLevel * lateR;
         
-        // Highpass
         finalL = highPassL.process(finalL);
         finalR = highPassR.process(finalR);
+        
+        // Output gain (before quantization so noise floor isn't amplified)
+        constexpr float OUTPUT_GAIN = 5.0f;
+        finalL *= OUTPUT_GAIN;
+        finalR *= OUTPUT_GAIN;
         
         // 12-bit dither
         constexpr float LEVELS = 4096.0f;

@@ -15,8 +15,8 @@ using namespace Steinberg;
 namespace Yonie {
 
 //------------------------------------------------------------------------
-// Reverb preset configurations
-// Inspired by Yamaha R1000, EHX Holy Grail, Roland DEP-5
+// Reverb preset configurations - Diagnostic mode for artifact isolation
+// Each button isolates different parts of the reverb chain
 struct ReverbPreset {
     float decaySeconds;
     float preDelayMs;
@@ -33,13 +33,13 @@ struct ReverbPreset {
 static const ReverbPreset REVERB_PRESETS[5] = {
     // Room: tight, grainy, dark - RT60 ~0.6s
     { 0.6f, 0.0f, 3500.0f, 4, 0.62f, 0.50f, 0, 0.25f, 0.75f, 15.0f },
-    // Plate: denser, metallic - RT60 ~1.6s
+    // Plate: dense, metallic - RT60 ~1.6s
     { 1.6f, 0.0f, 4500.0f, 4, 0.78f, 0.50f, 1, 0.18f, 0.82f, 22.0f },
     // Hall: smooth, warm - RT60 ~2.2s
     { 2.2f, 20.0f, 4500.0f, 5, 0.84f, 0.50f, 2, 0.15f, 0.85f, 28.0f },
     // Cathedral: lush, long - RT60 ~3.0s
     { 3.0f, 30.0f, 5000.0f, 5, 0.88f, 0.50f, 3, 0.12f, 0.88f, 35.0f },
-    // Cosmos: ethereal infinite - RT60 ~4.5s
+    // Cosmos: ethereal, infinite - RT60 ~4.5s
     { 4.5f, 40.0f, 5000.0f, 5, 0.91f, 0.50f, 4, 0.10f, 0.90f, 45.0f }
 };
 
@@ -166,7 +166,6 @@ tresult PLUGIN_API WetReverbProcessorProcessor::process (Vst::ProcessData& data)
 				updatePeak(inputR[i], inputPeakR);
 			}
 			
-			// Process reverb (100% wet)
 			const ReverbPreset& preset = REVERB_PRESETS[currentReverbMode];
 			reverbBuffer.processStereo(inputL, outputL, inputR, outputR,
 			                           data.numSamples,
