@@ -251,8 +251,8 @@ public:
         int readPos = writePos - delayLength;
         if (readPos < 0) readPos += static_cast<int>(buffer.size());
         float delayed = buffer[readPos];
-        float output = -input + delayed;
-        buffer[writePos] = input + delayed * feedback;
+        float output = -feedback * input + delayed;
+        buffer[writePos] = input + feedback * output;
         writePos++;
         if (writePos >= static_cast<int>(buffer.size())) writePos = 0;
         return output;
@@ -296,6 +296,10 @@ public:
         bufferSize = maxDelaySamples + 1;
         buffer.resize(bufferSize, 0.0f);
         writePos = 0;
+        for (int i = 0; i < MAX_TAPS; i++) {
+            tapFilterStateL[i] = 0.0f;
+            tapFilterStateR[i] = 0.0f;
+        }
     }
     
     void setTaps(const EarlyReflectionTap* taps, int count, double sampleRate)
@@ -307,6 +311,9 @@ public:
             tapDelaySamples[i] = std::min(tapDelaySamples[i], bufferSize - 1);
             tapGainL[i] = taps[i].gainL;
             tapGainR[i] = taps[i].gainR;
+            // Per-tap LPF: first tap nearly transparent, later taps progressively darker
+            // coef=0.95 → ~11kHz, coef=0.55 → ~4kHz at 24kHz sample rate
+            tapFilterCoef[i] = 0.95f - 0.05f * static_cast<float>(i);
         }
     }
     
@@ -317,7 +324,7 @@ public:
         if (writePos >= bufferSize) writePos = 0;
     }
     
-    void processToStereo(float& outL, float& outR) const
+    void processToStereo(float& outL, float& outR)
     {
         outL = 0.0f;
         outR = 0.0f;
@@ -326,8 +333,14 @@ public:
             int readPos = writePos - tapDelaySamples[i];
             if (readPos < 0) readPos += bufferSize;
             float sample = buffer[readPos];
-            outL += sample * tapGainL[i];
-            outR += sample * tapGainR[i];
+            
+            float filteredL = tapFilterCoef[i] * sample + (1.0f - tapFilterCoef[i]) * tapFilterStateL[i];
+            float filteredR = tapFilterCoef[i] * sample + (1.0f - tapFilterCoef[i]) * tapFilterStateR[i];
+            tapFilterStateL[i] = filteredL;
+            tapFilterStateR[i] = filteredR;
+            
+            outL += filteredL * tapGainL[i];
+            outR += filteredR * tapGainR[i];
         }
     }
     
@@ -335,6 +348,10 @@ public:
     {
         std::fill(buffer.begin(), buffer.end(), 0.0f);
         writePos = 0;
+        for (int i = 0; i < MAX_TAPS; i++) {
+            tapFilterStateL[i] = 0.0f;
+            tapFilterStateR[i] = 0.0f;
+        }
     }
     
 private:
@@ -345,6 +362,9 @@ private:
     int tapDelaySamples[MAX_TAPS];
     float tapGainL[MAX_TAPS];
     float tapGainR[MAX_TAPS];
+    float tapFilterCoef[MAX_TAPS];
+    float tapFilterStateL[MAX_TAPS];
+    float tapFilterStateR[MAX_TAPS];
 };
 
 //------------------------------------------------------------------------
@@ -391,7 +411,7 @@ public:
 private:
     static constexpr double INTERNAL_SAMPLE_RATE = 24000.0;
     static constexpr int MAX_COMBS = 6;
-    static constexpr int MAX_ALLPASSES = 2;
+    static constexpr int MAX_ALLPASSES = 4;
     static constexpr float CROSSTALK = 0.01f;
     
     CombFilter combsL[MAX_COMBS];
