@@ -115,8 +115,8 @@ void ReverbBuffer::prepare(double sampleRate, float maxDecaySeconds)
         allpassR[i].prepare(static_cast<int>(INTERNAL_SAMPLE_RATE * 0.05));
     }
     
-    preDelayL.prepare(static_cast<int>(INTERNAL_SAMPLE_RATE * 0.1));
-    preDelayR.prepare(static_cast<int>(INTERNAL_SAMPLE_RATE * 0.1));
+    preDelayL.prepare(static_cast<int>(INTERNAL_SAMPLE_RATE * 0.15));
+    preDelayR.prepare(static_cast<int>(INTERNAL_SAMPLE_RATE * 0.15));
     
     // Early reflections: max 500ms at internal rate (enough for prime delays up to 200ms)
     earlyReflections.prepare(static_cast<int>(INTERNAL_SAMPLE_RATE * 0.5));
@@ -194,7 +194,6 @@ void ReverbBuffer::setupEarlyReflections(int pattern)
 void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
                                float* rightIn, float* rightOut,
                                int numSamples,
-                               float decaySeconds,
                                float preDelayMs,
                                float hfDampHz,
                                int numCombs,
@@ -206,15 +205,23 @@ void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
                                float baseDelayMs)
 {
     if (tempDownL.empty() || numSamples <= 0) return;
-    
+
+    // Clamp numSamples to buffer size to prevent overrun
+    numSamples = std::min(numSamples, static_cast<int>(tempDownL.size()));
+    numCombs = std::min(numCombs, MAX_COMBS);
+
+    // Safety clamps
+    feedback = std::max(0.0f, std::min(0.98f, feedback));
+    allpassFeedback = std::max(0.0f, std::min(0.85f, allpassFeedback));
+
     setupCombs(numCombs, baseDelayMs);
     setupAllpasses();
     setupEarlyReflections(earlyPattern);
-    
-    int preDelaySamp = std::max(1, std::min(msToSamples(preDelayMs), static_cast<int>(INTERNAL_SAMPLE_RATE * 0.05)));
+
+    int preDelaySamp = std::max(1, std::min(msToSamples(preDelayMs), static_cast<int>(INTERNAL_SAMPLE_RATE * 0.12)));
     preDelayL.setDelay(preDelaySamp);
     preDelayR.setDelay(preDelaySamp + 1);
-    
+
     float dampCoef = static_cast<float>(1.0 - std::exp(-2.0 * 3.14159265358979323846 * std::min(hfDampHz, 10000.0f) / INTERNAL_SAMPLE_RATE));
     dampCoef = std::max(0.02f, std::min(0.98f, dampCoef));
     
@@ -269,7 +276,7 @@ void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
         
         float lateL = combOutL;
         float lateR = combOutR;
-        
+
         if (numCombs > 0) {
             for (int a = 0; a < MAX_ALLPASSES; ++a)
             {
@@ -277,7 +284,13 @@ void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
                 lateR = allpassR[a].process(lateR, allpassFeedback);
             }
         }
-        
+
+        // Catch NaN/Inf from feedback runaway
+        if (!(std::isfinite(lateL))) lateL = 0.0f;
+        if (!(std::isfinite(lateR))) lateR = 0.0f;
+        lateL = std::max(-4.0f, std::min(4.0f, lateL));
+        lateR = std::max(-4.0f, std::min(4.0f, lateR));
+
         // Late LPF
         lateL = lowPassL.process(lateL);
         lateR = lowPassR.process(lateR);
@@ -292,6 +305,10 @@ void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
         constexpr float OUTPUT_GAIN = 5.0f;
         finalL *= OUTPUT_GAIN;
         finalR *= OUTPUT_GAIN;
+
+        // Safety clamp to prevent runaway from high feedback
+        finalL = std::max(-2.0f, std::min(2.0f, finalL));
+        finalR = std::max(-2.0f, std::min(2.0f, finalR));
         
         // 12-bit dither
         constexpr float LEVELS = 4096.0f;

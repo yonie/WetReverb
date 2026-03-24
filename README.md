@@ -52,13 +52,13 @@ The download includes **all platforms** in one universal bundle:
 
 ### Reverb Modes
 
-| Mode | RT60 | Comb Filters | Pre-delay | Early Refl. | Character |
-|------|------|--------------|-----------|--------------|-----------|
-| Room | 0.6s | 4 | 0ms | 3-24ms (6 taps) | Tight, grainy, dark |
-| Plate | 1.6s | 4 | 0ms | 2-17ms (5 taps) | Dense, metallic |
-| Hall | 2.2s | 5 | 20ms | 8-53ms (7 taps) | Smooth, warm |
-| Cathedral | 3.0s | 5 | 30ms | 12-79ms (8 taps) | Lush, long |
-| Cosmos | 4.5s | 5 | 40ms | 15-92ms (6 taps) | Ethereal, infinite |
+| Mode | Comb Filters | Pre-delay | Early Refl. | Character |
+|------|--------------|-----------|--------------|-----------|
+| Room | 4 | 17ms | 3-24ms (6 taps) | Intimate, prominent reflections |
+| Plate | 8 | 0ms | 2-17ms (5 taps) | Dense shimmer |
+| Hall | 10 | 25ms | 8-53ms (7 taps) | Spacious, smooth |
+| Cathedral | 10 | 37ms | 12-79ms (8 taps) | Long, diffuse |
+| Cosmos | 12 | 65ms | 15-92ms (6 taps) | Ethereal, infinite wash |
 
 ## Features
 
@@ -163,10 +163,10 @@ The build process automatically runs the official VST3 validator (47 tests).
 
 1. Anti-alias filter (10kHz LPF at host rate)
 2. Downsample to 24kHz (linear interpolation)
-3. Pre-delay (mode-dependent: 0-40ms)
+3. Pre-delay (mode-dependent: 0-65ms)
 4. Early reflections (multitapped delay line, program-dependent)
-5. Parallel comb filters with internal damping (4-5 combs)
-6. Series allpass filters for diffusion (2 allpasses)
+5. Parallel comb filters with internal damping (4-12 combs)
+6. Series allpass filters for diffusion (4 allpasses)
 7. Mix early reflections + late reverb
 8. Output low-pass filter (6kHz)
 9. High-pass filter (80Hz)

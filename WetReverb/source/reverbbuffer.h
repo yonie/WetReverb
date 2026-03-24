@@ -201,15 +201,17 @@ public:
         int readPos = writePos - delayLength;
         if (readPos < 0) readPos += static_cast<int>(buffer.size());
         float delayed = buffer[readPos];
-        
+
         // LPF in feedback path
         dampingState = dampingCoef * delayed + (1.0f - dampingCoef) * dampingState;
-        
-        // Write to buffer
-        buffer[writePos] = input + dampingState * feedback;
+
+        // Write to buffer with safety clamp
+        float fbSample = input + dampingState * feedback;
+        if (!(fbSample > -4.0f && fbSample < 4.0f)) fbSample = 0.0f;
+        buffer[writePos] = fbSample;
         writePos++;
         if (writePos >= static_cast<int>(buffer.size())) writePos = 0;
-        
+
         return delayed;
     }
     
@@ -395,7 +397,6 @@ public:
     void processStereo(float* leftIn, float* leftOut,
                        float* rightIn, float* rightOut,
                        int numSamples,
-                       float decaySeconds,
                        float preDelayMs,
                        float hfDampHz,
                        int numCombs,
@@ -410,7 +411,7 @@ public:
     
 private:
     static constexpr double INTERNAL_SAMPLE_RATE = 24000.0;
-    static constexpr int MAX_COMBS = 6;
+    static constexpr int MAX_COMBS = 12;
     static constexpr int MAX_ALLPASSES = 4;
     static constexpr float CROSSTALK = 0.01f;
     

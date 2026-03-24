@@ -56,7 +56,7 @@ protected:
 	// Reverb buffer
 	ReverbBuffer reverbBuffer;
 	
-	// Current reverb mode index (0-5)
+	// Current reverb mode index (0-4)
 	int currentReverbMode = 0;
 	
 	// Peak level meters (thread-safe)
