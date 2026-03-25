@@ -18,7 +18,7 @@ Download the latest release from the [Releases page](https://github.com/yonie/We
 The download includes **all platforms** in one universal bundle:
 - Windows (x64)
 - Linux (x86_64)
-- macOS (Apple Silicon)
+- macOS (Intel & Apple Silicon)
 
 ### Installation
 
@@ -99,15 +99,6 @@ Full parameter automation support in all major DAWs.
 | **macOS** | macOS 11.0+ (Apple Silicon) or macOS 10.13+ (Intel) |
 
 **Supported DAWs:** Any DAW that supports VST3 plugins (Reaper, Cubase, Ableton Live, FL Studio, Studio One, Bitwig, etc.)
-
-## Changelog
-
-### v1.0.0 (2026-03-15)
-- Initial release
-- 5 reverb modes (Room, Plate, Hall, Cathedral, Cosmos)
-- 80s digital character (24kHz, 12-bit)
-- 9-segment LED meters
-- Multi-platform support (Windows, Linux, macOS)
 
 ## Building from Source
 
