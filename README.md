@@ -23,12 +23,12 @@ The download includes **all platforms** in one universal bundle:
 ### Installation
 
 #### Windows
-1. Download and extract `WetReverb-v1.0.0.zip`
+1. Download and extract the ZIP file
 2. Copy `WetReverb.vst3` to `C:\Program Files\Common Files\VST3\`
 3. Restart your DAW and scan for plugins
 
 #### Linux
-1. Download and extract `WetReverb-v1.0.0.zip`
+1. Download and extract the ZIP file
 2. Copy `WetReverb.vst3` to `~/.vst3/` (create the folder if needed)
    ```bash
    mkdir -p ~/.vst3
@@ -37,12 +37,20 @@ The download includes **all platforms** in one universal bundle:
 3. Restart your DAW and scan for plugins
 
 #### macOS
-1. Download and extract `WetReverb-v1.0.0.zip`
+1. Download and extract the ZIP file
 2. Copy `WetReverb.vst3` to `~/Library/Audio/Plug-Ins/VST3/` (create the folder if needed)
-3. Right-click `WetReverb.vst3` → Open → Click "Open" (one-time security bypass)
-4. Restart your DAW and scan for plugins
+3. Remove the quarantine attribute and restart your DAW:
+   ```bash
+   xattr -cr ~/Library/Audio/Plug-Ins/VST3/WetReverb.vst3
+   ```
 
-**macOS Security Note:** The plugin is unsigned. On first load, macOS will show a security prompt. Click "Open" to allow it. This only needs to be done once.
+> **Why does macOS block this plugin?**
+>
+> When you try to load the plugin, macOS may show: *"WetReverb.vst3" cannot be opened because the developer cannot be verified.*
+>
+> This **does not mean** the plugin is unsafe. Apple requires developers to enroll in the Apple Developer Program ($99/year) and notarize each build. As an independent developer releasing **free, open-source software** under the MIT license, I don't have the budget for Apple's developer program. The complete source code is available on [GitHub](https://github.com/yonie/WetReverb) for anyone to inspect and build themselves.
+>
+> This is a common issue with free audio plugins on macOS.
 
 ## Usage
 
