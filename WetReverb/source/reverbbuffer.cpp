@@ -310,6 +310,12 @@ void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
         finalL = std::max(-2.0f, std::min(2.0f, finalL));
         finalR = std::max(-2.0f, std::min(2.0f, finalR));
         
+        // Gain-stepping: boost before quantization for lower noise floor
+        // (same technique as Lexicon 224's DAC80 gain-ranging)
+        constexpr float QUANT_GAIN = 2.0f;
+        finalL *= QUANT_GAIN;
+        finalR *= QUANT_GAIN;
+
         // 12-bit dither
         constexpr float LEVELS = 4096.0f;
         constexpr float DITHER = 0.5f / LEVELS;
@@ -317,11 +323,10 @@ void ReverbBuffer::processStereo(float* leftIn, float* leftOut,
         float ditherR = (dist(rng) + dist(rng)) * DITHER;
         finalL = std::floor((finalL + ditherL) * LEVELS) / LEVELS;
         finalR = std::floor((finalR + ditherR) * LEVELS) / LEVELS;
-        
-        // Noise floor
-        constexpr float NOISE = 0.00005f;
-        finalL += dist(rng) * NOISE;
-        finalR += dist(rng) * NOISE;
+
+        // Remove gain-stepping boost
+        finalL /= QUANT_GAIN;
+        finalR /= QUANT_GAIN;
         
         tempOutL[i] = finalL;
         tempOutR[i] = finalR;
