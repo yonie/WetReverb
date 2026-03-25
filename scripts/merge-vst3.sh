@@ -14,19 +14,18 @@ echo "Creating universal bundle structure..."
 mkdir -p build/WetReverb.vst3/Contents/Resources
 mkdir -p build/WetReverb.vst3/Contents/x86_64-win
 mkdir -p build/WetReverb.vst3/Contents/x86_64-linux
-mkdir -p build/WetReverb.vst3/Contents/arm64-macos
+mkdir -p build/WetReverb.vst3/Contents/MacOS
 
-# Copy resources from Linux build (could be any platform - they're identical)
+# Copy resources from macOS build
 echo "Copying shared resources..."
-if [ -d "artifacts/linux/Contents/Resources" ]; then
-    cp -r artifacts/linux/Contents/Resources/* build/WetReverb.vst3/Contents/Resources/
-elif [ -d "artifacts/windows/Contents/Resources" ]; then
-    cp -r artifacts/windows/Contents/Resources/* build/WetReverb.vst3/Contents/Resources/
+if [ -d "artifacts/macos/Resources" ]; then
+    cp -r artifacts/macos/Resources/* build/WetReverb.vst3/Contents/Resources/
 elif [ -d "artifacts/macos/Contents/Resources" ]; then
     cp -r artifacts/macos/Contents/Resources/* build/WetReverb.vst3/Contents/Resources/
 fi
 
 # Copy Windows binary
+# Note: Windows binary in cross-platform bundle MUST have .vst3 extension (not .dll)
 echo "Copying Windows binary..."
 WINDOWS_FOUND=false
 if [ -f "artifacts/windows/Contents/x86_64-win/WetReverb.vst3" ]; then
@@ -37,9 +36,20 @@ elif [ -f "artifacts/windows/VST3/Release/WetReverb.vst3/Contents/x86_64-win/Wet
     cp artifacts/windows/VST3/Release/WetReverb.vst3/Contents/x86_64-win/WetReverb.vst3 build/WetReverb.vst3/Contents/x86_64-win/
     echo "  Found at artifacts/windows/VST3/Release/WetReverb.vst3/Contents/x86_64-win/WetReverb.vst3"
     WINDOWS_FOUND=true
+elif [ -f "artifacts/windows/Contents/x86_64-win/WetReverb.dll" ]; then
+    # Legacy: rename .dll to .vst3 for cross-platform bundle
+    cp artifacts/windows/Contents/x86_64-win/WetReverb.dll build/WetReverb.vst3/Contents/x86_64-win/WetReverb.vst3
+    echo "  Found at artifacts/windows/Contents/x86_64-win/WetReverb.dll (renamed to .vst3)"
+    WINDOWS_FOUND=true
+elif [ -f "artifacts/windows/VST3/Release/WetReverb.vst3/Contents/x86_64-win/WetReverb.dll" ]; then
+    # Legacy: rename .dll to .vst3 for cross-platform bundle
+    cp artifacts/windows/VST3/Release/WetReverb.vst3/Contents/x86_64-win/WetReverb.dll build/WetReverb.vst3/Contents/x86_64-win/WetReverb.vst3
+    echo "  Found at artifacts/windows/VST3/Release/WetReverb.vst3/Contents/x86_64-win/WetReverb.dll (renamed to .vst3)"
+    WINDOWS_FOUND=true
 fi
 if [ "$WINDOWS_FOUND" = false ]; then
     echo "WARNING: Windows binary not found!"
+    echo "Looking for Windows binary..."
     find artifacts/windows -name "*.dll" -o -name "WetReverb.vst3" 2>/dev/null | head -5 || echo "No Windows binary found"
 fi
 
@@ -60,34 +70,30 @@ if [ "$LINUX_FOUND" = false ]; then
     find artifacts/linux -name "*.so" 2>/dev/null | head -5 || echo "No SO files found"
 fi
 
-# Copy macOS binary
-echo "Copying macOS binary..."
+# Copy macOS universal binary
+echo "Copying macOS universal binary..."
 MACOS_FOUND=false
-if [ -f "artifacts/macos/Contents/arm64-macos/WetReverb" ]; then
-    cp artifacts/macos/Contents/arm64-macos/WetReverb build/WetReverb.vst3/Contents/arm64-macos/
-    echo "  Found at artifacts/macos/Contents/arm64-macos/WetReverb"
-    MACOS_FOUND=true
-elif [ -f "artifacts/macos/VST3/Release/WetReverb.vst3/Contents/MacOS/WetReverb" ]; then
-    cp artifacts/macos/VST3/Release/WetReverb.vst3/Contents/MacOS/WetReverb build/WetReverb.vst3/Contents/arm64-macos/
-    echo "  Found at artifacts/macos/VST3/Release/WetReverb.vst3/Contents/MacOS/WetReverb"
+if [ -f "artifacts/macos/MacOS/WetReverb" ]; then
+    cp artifacts/macos/MacOS/WetReverb build/WetReverb.vst3/Contents/MacOS/
+    echo "  Found at artifacts/macos/MacOS/WetReverb"
     MACOS_FOUND=true
 elif [ -f "artifacts/macos/Contents/MacOS/WetReverb" ]; then
-    cp artifacts/macos/Contents/MacOS/WetReverb build/WetReverb.vst3/Contents/arm64-macos/
+    cp artifacts/macos/Contents/MacOS/WetReverb build/WetReverb.vst3/Contents/MacOS/
     echo "  Found at artifacts/macos/Contents/MacOS/WetReverb"
     MACOS_FOUND=true
 fi
 if [ "$MACOS_FOUND" = false ]; then
-    echo "WARNING: macOS binary not found!"
+    echo "WARNING: macOS universal binary not found!"
     find artifacts/macos -type f -name "WetReverb" 2>/dev/null | head -5 || echo "No WetReverb executable found"
 fi
 
-# Copy macOS bundle metadata
+# Copy macOS bundle metadata (Info.plist, PkgInfo) for codesign compatibility
 echo "Copying macOS bundle metadata..."
 MACOS_PLIST_FOUND=false
-if [ -f "artifacts/macos/VST3/Release/WetReverb.vst3/Contents/Info.plist" ]; then
-    cp artifacts/macos/VST3/Release/WetReverb.vst3/Contents/Info.plist build/WetReverb.vst3/Contents/
-    [ -f "artifacts/macos/VST3/Release/WetReverb.vst3/Contents/PkgInfo" ] && cp artifacts/macos/VST3/Release/WetReverb.vst3/Contents/PkgInfo build/WetReverb.vst3/Contents/
-    echo "  Found at artifacts/macos/VST3/Release/WetReverb.vst3/Contents/"
+if [ -f "artifacts/macos/Info.plist" ]; then
+    cp artifacts/macos/Info.plist build/WetReverb.vst3/Contents/
+    [ -f "artifacts/macos/PkgInfo" ] && cp artifacts/macos/PkgInfo build/WetReverb.vst3/Contents/
+    echo "  Found at artifacts/macos/"
     MACOS_PLIST_FOUND=true
 elif [ -f "artifacts/macos/Contents/Info.plist" ]; then
     cp artifacts/macos/Contents/Info.plist build/WetReverb.vst3/Contents/
