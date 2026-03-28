@@ -187,5 +187,7 @@ jobs:
           files: WetReverb-${{ github.ref_name }}.zip
           generate_release_notes: true
           draft: false
+          body: |
+            Fixed a bug where the selected reverb mode was not remembered across DAW sessions.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

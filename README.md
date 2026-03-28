@@ -100,6 +100,18 @@ Full parameter automation support in all major DAWs.
 
 **Supported DAWs:** Any DAW that supports VST3 plugins (Reaper, Cubase, Ableton Live, FL Studio, Studio One, Bitwig, etc.)
 
+## Changelog
+
+### v1.0.1 (2026-03-28)
+- Fixed a bug where the selected reverb mode was not remembered across DAW sessions
+
+### v1.0.0 (2026-03-15)
+- Initial release
+- 5 reverb modes (Room, Plate, Hall, Cathedral, Cosmos)
+- 80s digital character (24kHz, 12-bit)
+- 9-segment LED meters
+- Multi-platform support (Windows, Linux, macOS)
+
 ## Building from Source
 
 For developers who want to build the plugin themselves.
