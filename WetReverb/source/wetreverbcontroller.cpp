@@ -69,7 +69,7 @@ tresult PLUGIN_API WetReverbProcessorController::setComponentState (IBStream* st
 	IBStreamer streamer(state, kLittleEndian);
 
 	int32 savedReverbMode = 0;
-	if (streamer.readInt32(savedReverbMode) == kResultTrue)
+	if (streamer.readInt32(savedReverbMode))
 	{
 		currentReverbMode = savedReverbMode;
 		setParamNormalized(kReverbModeParam, savedReverbMode / 4.0);
