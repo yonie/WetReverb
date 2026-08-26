@@ -188,6 +188,13 @@ jobs:
           generate_release_notes: true
           draft: false
           body: |
-            Fixed a bug where the selected reverb mode was not remembered across DAW sessions.
+            **Fixes occasional clicks and crackles, and the mode buttons**
+
+            The same fault WetDelay had. Some users heard intermittent clicks that built
+            up over time, worst at small buffer sizes, and the plugin could occasionally
+            overshoot and distort. Fixed. All five reverb modes sound exactly as they did.
+
+            Also fixed: clicking near the left edge of a mode button could select the
+            button to its left. Every part of every button now selects its own mode.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

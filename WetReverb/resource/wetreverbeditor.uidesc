@@ -80,12 +80,27 @@
 		<!-- ============================================ -->
 		<!-- REVERB MODE BUTTON SELECTION                -->
 		<!-- Transparent CSegmentButton for click handling-->
+		<!--
+		  The five painted buttons are ~111 px wide with ~10 px gaps between
+		  them, but CSegmentButton divides its width into five EVEN cells. At
+		  the old 630 the cells were 126 px, so every boundary sat further
+		  right than the gap it belonged in and the error accumulated: the
+		  left 6 px of Plate selected Room, 12 px of Hall selected Plate,
+		  16 px of Cathedral selected Hall, 21 px of Cosmos selected
+		  Cathedral, and 36 px of bare panel past Cosmos still selected it.
+
+		  595 makes the cells 119 px, which puts all four internal boundaries
+		  (173, 292, 411, 530) inside a painted gap, so every pixel of every
+		  painted button now selects its own mode. Do not "tidy" this back to
+		  a round number. The ButtonSelectionFrame below keeps 630: its LED
+		  offsets were hand-tuned to the art and were always correct.
+		-->
 		<!-- ============================================ -->
 		
 		<view class="CSegmentButton"
 		      control-tag="kReverbModeParam"
 		      origin="54, 418"
-		      size="630, 119"
+		      size="595, 119"
 		      font="TinyFont"
 		      font-color="Transparent"
 		      font-color-highlighted="Transparent"
