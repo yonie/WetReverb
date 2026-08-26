@@ -11,7 +11,7 @@ if(NOT vst3sdk_SOURCE_DIR)
 endif()
 
 project(WetReverb
-    VERSION 1.0.1.0
+    VERSION 1.0.2.0
     DESCRIPTION "WetReverb VST 3 Plug-in"
 )
 
