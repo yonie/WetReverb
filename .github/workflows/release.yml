@@ -187,14 +187,34 @@ jobs:
           files: WetReverb-${{ github.ref_name }}.zip
           generate_release_notes: true
           draft: false
+          # NOTE: this body is hardcoded and does NOT update itself. Rewrite the
+          # description before every tag - it has lagged a release behind before.
+          # The Installation block below is REQUIRED and stays: people land on the
+          # release page from an aggregator with no idea what to do with a .vst3.
           body: |
-            **Fixes occasional clicks and crackles, and the mode buttons**
+            Added a UI zoom option. Right-click the panel, pick UI Zoom, and choose 75%,
+            100% or 125%; the window redraws on the spot. Nothing on the audio side was
+            touched.
 
-            The same fault WetDelay had. Some users heard intermittent clicks that built
-            up over time, worst at small buffer sizes, and the plugin could occasionally
-            overshoot and distort. Fixed. All five reverb modes sound exactly as they did.
+            125% is the ceiling because the panel graphics are bitmaps drawn at 100%, so
+            anything larger just interpolates and blurs. This came out of the 702x640
+            window being hard to read on 4K and scaled desktops.
 
-            Also fixed: clicking near the left edge of a mode button could select the
-            button to its left. Every part of every button now selects its own mode.
+            ### Installation
+
+            First, download the ZIP (see Assets below).
+
+            **Windows**: Extract to `C:\Program Files\Common Files\VST3\`
+
+            **Linux**: Extract to `~/.vst3/` or `/usr/lib/vst3/`
+
+            **macOS**:
+            1. Extract to `~/Library/Audio/Plug-Ins/VST3/`
+            2. Run: `xattr -cr ~/Library/Audio/Plug-Ins/VST3/WetReverb.vst3`
+            3. The plugin is unsigned, so macOS quarantines it. That does not mean it is unsafe.
+
+            Restart your DAW and rescan for plugins.
+
+            See the [README](https://github.com/yonie/WetReverb/blob/main/README.md) for full details.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
