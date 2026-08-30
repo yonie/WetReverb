@@ -231,3 +231,7 @@ The VST3 SDK is licensed separately under a BSD-style license (see VST3 SDK lice
 ---
 
 **Built with precision engineering for authentic vintage reverb character**
+
+---
+
+Part of **[WET](https://wetvst.com)** - with [WetDelay](https://github.com/yonie/WetDelay), [WetEQ](https://github.com/yonie/WetEQ) and [WetCompressor](https://github.com/yonie/WetCompressor)
