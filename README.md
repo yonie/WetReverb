@@ -9,6 +9,8 @@ A professional reverb VST3 plugin with authentic 80s digital character, inspired
 
 ![WetReverb Plugin Screenshot](screenshot.png)
 
+> **Panel too big or too small?** Right-click anywhere on the panel and pick **UI Zoom** - 75%, 100% or 125%.
+
 ## Quick Start
 
 ### Download
@@ -57,6 +59,7 @@ The download includes **all platforms** in one universal bundle:
 1. **Load the plugin** in your DAW (Reaper, Cubase, Ableton Live, FL Studio, etc.)
 2. **Select reverb mode** using the 5 buttons: Room, Plate, Hall, Cathedral, Cosmos
 3. **Monitor levels** using the input/output LED meters
+4. **Resize the panel** by right-clicking it and picking UI Zoom - 75%, 100% or 125%
 
 ### Reverb Modes
 
