@@ -178,7 +178,8 @@ jobs:
       - name: Create ZIP archive
         run: |
           cd build
-          zip -r ../WetReverb-${{ github.ref_name }}.zip WetReverb.vst3
+          cp ../packaging/README.txt .
+          zip -r ../WetReverb-${{ github.ref_name }}.zip WetReverb.vst3 README.txt
           ls -la ../WetReverb-${{ github.ref_name }}.zip
 
       - name: Create Release
