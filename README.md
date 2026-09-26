@@ -41,18 +41,19 @@ The download includes **all platforms** in one universal bundle:
 #### macOS
 1. Download and extract the ZIP file
 2. Copy `WetReverb.vst3` to `~/Library/Audio/Plug-Ins/VST3/` (create the folder if needed)
-3. Remove the quarantine attribute and restart your DAW:
-   ```bash
-   xattr -cr ~/Library/Audio/Plug-Ins/VST3/WetReverb.vst3
-   ```
+3. Copy `WetReverb.component` to `~/Library/Audio/Plug-Ins/Components/` for Logic and GarageBand
+4. Restart your DAW and scan for plugins
 
-> **Why does macOS block this plugin?**
->
-> When you try to load the plugin, macOS may show: *"WetReverb.vst3" cannot be opened because the developer cannot be verified.*
->
-> This **does not mean** the plugin is unsafe. Apple requires developers to enroll in the Apple Developer Program ($99/year) and notarize each build. As an independent developer releasing **free, open-source software** under the MIT license, I don't have the budget for Apple's developer program. The complete source code is available on [GitHub](https://github.com/yonie/WetReverb) for anyone to inspect and build themselves.
->
-> This is a common issue with free audio plugins on macOS.
+The plug-in is signed and notarised by Apple, so macOS opens it without a warning.
+
+#### If macOS still blocks it
+
+Older releases were not signed. If macOS says the plug-in "cannot be opened because the developer cannot be verified", remove the quarantine flag in Terminal and restart your DAW:
+
+```bash
+xattr -cr ~/Library/Audio/Plug-Ins/VST3/WetReverb.vst3
+xattr -cr ~/Library/Audio/Plug-Ins/Components/WetReverb.component
+```
 
 ## Usage
 
@@ -211,8 +212,7 @@ WetReverb/
 - Run a plugin rescan in your DAW settings
 
 ### macOS "Apple Could Not Verify" Warning
-- Right-click the plugin → Open → Open (one-time)
-- Or run: `xattr -cr ~/Library/Audio/Plug-Ins/VST3/WetReverb.vst3`
+- Only older, unsigned releases do this - see "If macOS still blocks it" above
 
 ### No Sound Output
 - Verify the plugin is receiving audio input (check meters)
