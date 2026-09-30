@@ -30,23 +30,17 @@ if [ ! -d "vst3sdk" ]; then
     exit 1
 fi
 
-# Ensure VSTGUI fork with Linux fix is used (symlinked from WetDelay)
-echo "Ensuring VSTGUI fork with Linux REAPER crash fix..."
-cd vst3sdk/vstgui4 2>/dev/null || {
-    echo "ERROR: vst3sdk/vstgui4 not found. Did you clone with --recursive?"
-    exit 1
-}
-if ! git remote | grep -q "yonie"; then
-    git remote add yonie https://github.com/yonie/vstgui.git 2>/dev/null || true
+
+# Linux only: VSTGUI from yonie/vstgui, pinned. It is the VSTGUI Steinberg's SDK pins, plus
+# two Linux fixes: cairo_device_finish (a crash when an editor is reopened in Reaper) and the
+# X11 run-loop order (a crash when a host such as Carla opens the editor). macOS keeps
+# Steinberg's VSTGUI.
+VSTGUI_FORK_COMMIT=17888e65966cf41919b44237a6fb8c1aba73951a
+if [ "$PLATFORM" = "linux" ]; then
+    echo "Using VSTGUI $VSTGUI_FORK_COMMIT from yonie/vstgui (Linux fixes)"
+    ( cd vst3sdk/vstgui4 &&       { git cat-file -e "$VSTGUI_FORK_COMMIT^{commit}" 2>/dev/null || git fetch -q https://github.com/yonie/vstgui.git wet-linux; } &&       git checkout -q "$VSTGUI_FORK_COMMIT" ) || { echo "ERROR: could not check out VSTGUI $VSTGUI_FORK_COMMIT"; exit 1; }
+    echo ""
 fi
-git fetch yonie 2>/dev/null
-if git branch --list "fix/linux-cairo-crash" | grep -q "."; then
-    git checkout fix/linux-cairo-crash 2>/dev/null
-else
-    git checkout -b fix/linux-cairo-crash yonie/fix/linux-cairo-crash 2>/dev/null
-fi
-cd "$SCRIPT_DIR"
-echo ""
 
 if [ -d "WetReverb/build" ]; then
     echo "Cleaning previous build..."
