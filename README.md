@@ -7,7 +7,9 @@
 
 A professional reverb VST3 plugin with authentic 80s digital character, after the rack reverbs and pedals of that decade.
 
-![WetReverb Plugin Screenshot](screenshot.png)
+**Download:** [wetvst.com/wetreverb](https://wetvst.com/wetreverb/)
+
+[![WetReverb Plugin Screenshot](screenshot.png)](https://wetvst.com/wetreverb/)
 
 > **Panel too big or too small?** Right-click anywhere on the panel and pick **UI Zoom** - 75%, 100% or 125%.
 
@@ -15,7 +17,7 @@ A professional reverb VST3 plugin with authentic 80s digital character, after th
 
 ### Download
 
-Download the latest release from the [Releases page](https://github.com/yonie/WetReverb/releases).
+Download the latest release from [wetvst.com](https://wetvst.com/wetreverb/) or the [Releases page](https://github.com/yonie/WetReverb/releases).
 
 The download includes **all platforms** in one universal bundle:
 - Windows (x64)
