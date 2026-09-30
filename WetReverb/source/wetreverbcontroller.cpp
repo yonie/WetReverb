@@ -3,6 +3,7 @@
 //------------------------------------------------------------------------
 
 #include "wetreverbcontroller.h"
+#include "weteditor.h"
 #include "wetreverbcids.h"
 #include "vstgui/plugin-bindings/vst3editor.h"
 #include "base/source/fstreamer.h"
@@ -143,7 +144,7 @@ IPlugView* PLUGIN_API WetReverbProcessorController::createView (FIDString name)
 {
 	if (FIDStringsEqual (name, Vst::ViewType::kEditor))
 	{
-		auto* view = new VSTGUI::VST3Editor (this, "view", "wetreverbeditor.uidesc");
+		auto* view = new Yonie::WetEditor (this, "view", "wetreverbeditor.uidesc");
 
 		// Discrete zoom steps, in the editor's context menu under "UI Zoom".
 		// VSTGUI handles the resize; the panel is a fixed layout, so free
