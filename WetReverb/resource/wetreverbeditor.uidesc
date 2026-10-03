@@ -46,7 +46,7 @@
 		      horizontal="true"
 		      db-min="-48"
 		      db-max="16"
-		      db-thresholds="-48, -36, -24, -12, -6, -3, 0, 3, 6"
+		      db-thresholds="-36, -24, -12, -9, -6, -3, 0, 3, 6"
 		      transparent="false"/>
 		
 		<view class="LEDMeterView"
@@ -58,7 +58,7 @@
 		      horizontal="true"
 		      db-min="-48"
 		      db-max="16"
-		      db-thresholds="-48, -36, -24, -12, -6, -3, 0, 3, 6"
+		      db-thresholds="-36, -24, -12, -9, -6, -3, 0, 3, 6"
 		      transparent="false"/>
 		
 		<!-- ============================================ -->
@@ -74,7 +74,7 @@
 		      horizontal="true"
 		      db-min="-48"
 		      db-max="16"
-		      db-thresholds="-48, -36, -24, -12, -6, -3, 0, 3, 6"
+		      db-thresholds="-36, -24, -12, -9, -6, -3, 0, 3, 6"
 		      transparent="false"/>
 		
 		<view class="LEDMeterView"
@@ -86,7 +86,7 @@
 		      horizontal="true"
 		      db-min="-48"
 		      db-max="16"
-		      db-thresholds="-48, -36, -24, -12, -6, -3, 0, 3, 6"
+		      db-thresholds="-36, -24, -12, -9, -6, -3, 0, 3, 6"
 		      transparent="false"/>
 		
 		<!-- ============================================ -->
