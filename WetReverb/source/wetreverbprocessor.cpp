@@ -166,11 +166,13 @@ void WetReverbProcessorProcessor::sendMeterData()
 	{
 		message->setMessageID(kMeterDataMessage);
 
+		// As dB, so a reading above 0 dBFS survives the controller's 0..1
+		// parameter clamp (meterlevel.h).
 		float meterData[4] = {
-			inputPeakL.load(),
-			inputPeakR.load(),
-			outputPeakL.load(),
-			outputPeakR.load()
+			Meter::encode(inputPeakL.load()),
+			Meter::encode(inputPeakR.load()),
+			Meter::encode(outputPeakL.load()),
+			Meter::encode(outputPeakR.load())
 		};
 
 		message->getAttributes()->setBinary("data", meterData, sizeof(meterData));

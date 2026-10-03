@@ -45,7 +45,7 @@
 		      segment-gap="2"
 		      horizontal="true"
 		      db-min="-48"
-		      db-max="18"
+		      db-max="16"
 		      transparent="false"/>
 		
 		<view class="LEDMeterView"
@@ -56,7 +56,7 @@
 		      segment-gap="2"
 		      horizontal="true"
 		      db-min="-48"
-		      db-max="18"
+		      db-max="16"
 		      transparent="false"/>
 		
 		<!-- ============================================ -->
@@ -71,7 +71,7 @@
 		      segment-gap="2"
 		      horizontal="true"
 		      db-min="-48"
-		      db-max="18"
+		      db-max="16"
 		      transparent="false"/>
 		
 		<view class="LEDMeterView"
@@ -82,7 +82,7 @@
 		      segment-gap="2"
 		      horizontal="true"
 		      db-min="-48"
-		      db-max="18"
+		      db-max="16"
 		      transparent="false"/>
 		
 		<!-- ============================================ -->

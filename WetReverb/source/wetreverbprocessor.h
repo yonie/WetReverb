@@ -8,6 +8,7 @@
 #include "reverbbuffer.h"
 #include "wetreverbcids.h"
 #include "monobus.h"
+#include "meterlevel.h"
 #include <atomic>
 
 namespace Yonie {
