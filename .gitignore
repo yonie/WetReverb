@@ -28,3 +28,6 @@ WetReverb/.cache/
 
 # Local config
 local.props
+
+# Release build tree
+*/build-rel/

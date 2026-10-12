@@ -5,13 +5,13 @@
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
 ![Version](https://img.shields.io/badge/version-1.1.1-orange)
 
-A professional reverb VST3 plugin with authentic 80s digital character, after the rack reverbs and pedals of that decade.
+Original reverberation effect with five programs great for vocal and drums effects all the way to near endless space simulation.
 
 **Download:** [wetvst.com/wetreverb](https://wetvst.com/wetreverb/)
 
 [![WetReverb Plugin Screenshot](screenshot.png)](https://wetvst.com/wetreverb/)
 
-> **Panel too big or too small?** Right-click anywhere on the panel and pick **UI Zoom** - 75%, 100% or 125%.
+> **Panel too big or too small?** Right-click anywhere on the panel and pick **UI Zoom**, from 50% to 125%.
 
 ## Quick Start
 
@@ -62,7 +62,7 @@ xattr -cr ~/Library/Audio/Plug-Ins/Components/WetReverb.component
 1. **Load the plugin** in your DAW (Reaper, Cubase, Ableton Live, FL Studio, etc.)
 2. **Select reverb mode** using the 5 buttons: Room, Plate, Hall, Cathedral, Cosmos
 3. **Monitor levels** using the input/output LED meters
-4. **Resize the panel** by right-clicking it and picking UI Zoom - 75%, 100% or 125%
+4. **Resize the panel** by right-clicking it and picking UI Zoom, from 50% to 125%
 
 ### Reverb Modes
 
@@ -76,25 +76,13 @@ xattr -cr ~/Library/Audio/Plug-Ins/Components/WetReverb.component
 
 ## Features
 
-### 100% Wet Reverb
-Pure reverb signal output - no dry signal in the mix. Perfect for:
-- Parallel processing with dry signal in your DAW
-- Creative sound design
-- Authentic vintage rack reverb simulation
+- 5 reverb modes (Room, Plate, Hall, Cathedral, Cosmos) suitable for any goal including vocals and drums as well as creative effects
+- Vintage digital signal path: 24kHz internal rate, 12-bit quantisation
+- Stereo including slight crosstalk like original units from the era
+- Real-time input/output LED metering
+- Resizable panel: right-click and zoom from 50% to 125%
+- 100% wet output - no dry signal in the mix
 
-### 80s Rack-Style Character
-- **24 kHz Internal Sample Rate** - Authentic vintage digital reverb with band-limited frequency response
-- **12-bit Quantization** - Classic gritty digital character
-- **TPDF Dither** - Smooth quantization
-- **Stereo Crosstalk** - Authentic L/R channel bleed simulating analog circuitry
-- **Early Reflections** - Program-dependent multitapped delay lines for realistic room ambience
-- **HF Damping** - Mode-dependent high-frequency rolloff
-
-### Schroeder-Style Algorithm
-Parallel comb filters with damping followed by series allpass diffusion.
-
-### VST3 Automation
-Full parameter automation support in all major DAWs.
 
 ## System Requirements
 
@@ -106,17 +94,6 @@ Full parameter automation support in all major DAWs.
 
 **Supported DAWs:** Any DAW that supports VST3 plugins (Reaper, Cubase, Ableton Live, FL Studio, Studio One, Bitwig, etc.)
 
-## Changelog
-
-### v1.0.1 (2026-03-28)
-- Fixed a bug where the selected reverb mode was not remembered across DAW sessions
-
-### v1.0.0 (2026-03-15)
-- Initial release
-- 5 reverb modes (Room, Plate, Hall, Cathedral, Cosmos)
-- 80s digital character (24kHz, 12-bit)
-- 9-segment LED meters
-- Multi-platform support (Windows, Linux, macOS)
 
 ## Building from Source
 
@@ -235,7 +212,6 @@ The VST3 SDK is licensed separately under a BSD-style license (see VST3 SDK lice
 
 ---
 
-**Built with precision engineering for authentic vintage reverb character**
 
 ---
 

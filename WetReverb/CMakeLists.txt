@@ -74,7 +74,7 @@ smtg_target_configure_version_file(WetReverb)
 if(SMTG_MAC)
     smtg_target_set_bundle(WetReverb
         BUNDLE_IDENTIFIER org.yonie.vst3.wetreverb
-        COMPANY_NAME "Yonie"
+        COMPANY_NAME "WET VST"
     )
     smtg_target_set_debug_executable(WetReverb
         "/Applications/VST3PluginTestHost.app"
